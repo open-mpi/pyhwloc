@@ -99,8 +99,11 @@ A complete list of options available for the ``--config-settings=``:
 - ``build-dir=/path/to/build/dir`` for specifying a build dir.
 - ``hwloc-src-dir=/path/to/hwloc-src`` for using a local checkout of hwloc. This assumes
   the src directory is the git repo, which is not the same as the release tarball.
-- ``hwloc-root-dir=/path/to/hwloc`` to specify the path of an existing hwloc installation.
+- ``hwloc-root-dir=/path/to/hwloc`` to specify the path of an existing binary hwloc
+  installation.
 - ``fetch-hwloc=True`` to build the fat wheel.
+- ``with-cuda=False`` to build pyhwloc without CUDA plugins. This is used for building
+  document in a minimum environment and is not tested for other purposes.
 
 The binary wheel uses plugins by default. Due to the plugins support, all symbols from
 hwloc are loaded into the linker's public name space using

@@ -25,6 +25,7 @@ if(PYHWLOC_FETCH_HWLOC)
 
   include(FetchContent)
   file(READ ${pyhwloc_SOURCE_DIR}/dev/hwloc_version HWLOC_VERSION)
+  message(STATUS "HWLOC_VERSION: ${HWLOC_VERSION}")
   FetchContent_Declare(
     hwloc
     GIT_REPOSITORY https://github.com/open-mpi/hwloc.git
