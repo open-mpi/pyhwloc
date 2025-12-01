@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 import tempfile
 from contextlib import contextmanager
 from typing import Iterator
@@ -74,6 +75,9 @@ def _chdir(dirname: str) -> Iterator[None]:
 
 
 def build_hwloc_xml() -> str:
+    if sys.platform == "win32":
+        raise NotImplementedError("Read the docs environment should be Linux.")
+
     hwloc_version_path = os.path.join(
         normpath(os.path.dirname(__file__)),
         os.pardir,
@@ -101,7 +105,7 @@ cd doc
 HWLOC_DOXYGEN_GENERATE_XML=YES doxygen ./doxygen.cfg
 # Result is in `hwloc/doc/doxygen-doc/xml`
 
-mkdir {pwd}/
+# Copy and cleanup
 cp -r doxygen-doc/xml {pwd}/
 """
         script_path = os.path.join(tmpdir, "build_xml.sh")
@@ -111,6 +115,20 @@ cp -r doxygen-doc/xml {pwd}/
         with _chdir(tmpdir):
             subprocess.check_call(["bash", script_path])
             xml_path = os.path.join(pwd, "xml")
+
+        # Install pyhwloc while we have the hwloc source
+        hwloc_src_dir = os.path.join(tmpdir, "hwloc")
+        subprocess.check_call(
+            [
+                "pip",
+                "install",
+                ".",
+                "--config-settings=fetch-hwloc=True",
+                f"--config-settings=hwloc-src-dir={hwloc_src_dir}",
+                "--no-deps",
+                "--no-build-isolation",
+            ]
+        )
 
     return xml_path
 
