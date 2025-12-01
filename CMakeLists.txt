@@ -23,10 +23,11 @@ if(PYHWLOC_FETCH_HWLOC)
   set(PYHWLOC_CONFIG_HWLOC OFF CACHE BOOL "")
 
   include(FetchContent)
+  file(READ ${pyhwloc_SOURCE_DIR}/dev/hwloc_version HWLOC_VERSION)
   FetchContent_Declare(
     hwloc
     GIT_REPOSITORY https://github.com/open-mpi/hwloc.git
-    GIT_TAG        82d8d2c1ad17e0b48f046f997271e45946bd342e
+    GIT_TAG        ${HWLOC_VERSION}
   )
 
   # Configure hwloc build options

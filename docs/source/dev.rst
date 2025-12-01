@@ -8,6 +8,11 @@ Symbol Conflicts
 The hwloc is loaded into the public linker name space to support hwloc plugins. This might
 have unintended consequences.
 
+Update hwloc
+============
+
+Update the commit hash in ``dev/hwloc_version``.
+
 Design Decisions
 ================
 
