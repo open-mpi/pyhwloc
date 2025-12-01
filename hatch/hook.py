@@ -168,6 +168,10 @@ class CMakeBuildHook(BuildHookInterface):
                 raise FileNotFoundError(root_dir)
             cmake_args.append(f"-DHWLOC_ROOT={root_dir}")
 
+        # No CUDA in RTD
+        if os.environ.get("READTHEDOCS", None) == "True":
+            cmake_args.append("-DPYHWLOC_WITH_CUDA=OFF")
+
         # Source path
         if os.environ.get(SRC_KEY, None) is not None:
             src_dir = os.environ[SRC_KEY]
