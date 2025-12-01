@@ -13,6 +13,7 @@ build:
     - graphviz
     - cmake
     - autotools-dev
+    - libtool
     - doxygen
     - ninja-build
 
