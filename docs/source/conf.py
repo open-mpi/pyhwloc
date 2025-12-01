@@ -122,7 +122,7 @@ cp -r doxygen-doc/xml {pwd}/
             [
                 "pip",
                 "install",
-                ".",
+                PROJECT_ROOT,
                 "--config-settings=fetch-hwloc=True",
                 f"--config-settings=hwloc-src-dir={hwloc_src_dir}",
                 "--no-deps",
