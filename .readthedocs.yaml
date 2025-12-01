@@ -22,4 +22,4 @@ sphinx:
    configuration: docs/source/conf.py
 
 conda:
-  environment: dev/pyhwloc_ext_dev.yml
+  environment: dev/pyhwloc_dev.yml
