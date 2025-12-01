@@ -94,7 +94,7 @@ git checkout {hwloc_version}
 
 # Config
 ./autogen.sh
-./configure --prefix=$CONDA_PREFIX --disable-nvml --enable-doxygen
+./configure --disable-nvml --enable-doxygen
 
 # Build doc
 cd doc
