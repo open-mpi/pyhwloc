@@ -152,4 +152,4 @@ else:
             PROJECT_ROOT, os.path.pardir, "hwloc/doc/doxygen-doc/xml"
         )
 breathe_projects = {"pyhwloc": hwloc_xml_path}
-print("beathe projects", breathe_projects)
+print("breathe projects", breathe_projects)
