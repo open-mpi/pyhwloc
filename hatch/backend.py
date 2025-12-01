@@ -29,7 +29,7 @@ def build_config(config_settings: dict[str, Any] | None) -> Iterator[None]:
         if "with-cuda" in config_settings:
             v = config_settings["with-cuda"]
             assert v in ("True", "False")
-            os.environ[CUDA_KEY] = CUDA_KEY
+            os.environ[CUDA_KEY] = v
     try:
         yield
     finally:
@@ -41,6 +41,8 @@ def build_config(config_settings: dict[str, Any] | None) -> Iterator[None]:
             del os.environ[SRC_KEY]
         if ROOT_KEY in os.environ:
             del os.environ[ROOT_KEY]
+        if CUDA_KEY in os.environ:
+            del os.environ[CUDA_KEY]
 
 
 def build_wheel(
