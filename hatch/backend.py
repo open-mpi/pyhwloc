@@ -29,7 +29,7 @@ def build_config(config_settings: dict[str, Any] | None) -> Iterator[None]:
         if "with-cuda" in config_settings:
             v = config_settings["with-cuda"]
             assert v in ("True", "False")
-            os.environ[FETCH_KEY] = CUDA_KEY
+            os.environ[CUDA_KEY] = CUDA_KEY
     try:
         yield
     finally:
