@@ -1,3 +1,5 @@
+hatchling
+packaging
 sphinx
 breathe
 sphinx-gallery
