@@ -34,3 +34,22 @@ the getter.
 For interpolation modules, hwloc supports getting the CPU affinity of GPUs with functions
 like ``nvml_get_device_cpuset``. We rename the function in the high-level interface as
 ``get_affinity`` to avoid confusion.
+
+GitHub CI
+=========
+
+PyHwloc's GitHub action tests use container images cached in ``ghcr.io``. Please refer to
+the `GitHub document <https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry>`__ for an in-depth explanation of how it works.
+
+To create the initial GitHub package for PyHwloc:
+
+- Create a personal access token (classic) in the GitHub `developer settings <https://github.com/settings/tokens>`__, with write access (`write:packages`) to the GitHub package.
+- Log in with docker.
+- Build the container image as described in the building from source document, use the tag ``ghcr.io/open-mpi/pyhwloc:latest``.
+- Push the image and find the package in https://github.com/orgs/open-mpi/packages
+
+Currently, the image is private. To use the image for GitHub action:
+
+- Create a read-only PAT (classic, `read:packages`).
+- Store it as project secret in the project's settings tab: `Settings -> Secrets and Variables -> Actions`.
+- Refer to the name of the secret in GitHub action container configurations.

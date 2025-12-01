@@ -165,15 +165,3 @@ The container image used for GitHub action is built from the `dev/Dockerfile.cpu
 .. code-block:: sh
 
   docker build --progress=plain -f ./Dockerfile.cpu . -t pyhwloc:latest
-
-GitHub CI
-=========
-
-PyHwloc's GitHub action tests use container images cached in ghcr.io. To create the initial GitHub package, please refer to https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry . The general workflow:
-- Create a personal access token (classic), with write access to the GitHub package.
-- Log in with docker.
-- Build the container image as described above, with the tag ``ghcr.io/open-mpi/pyhwloc:latest``.
-- Push the image, see the package in https://github.com/orgs/open-mpi/packages
-
-To use the image for GitHub action:
-- Create a read-only PAT, store it as project secret in the settings tab.
