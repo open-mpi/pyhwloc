@@ -1,3 +1,6 @@
+# Copyright (c) 2025, NVIDIA CORPORATION.
+# SPDX-License-Identifier: BSD-3-Clause
+
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -39,7 +42,7 @@ autodoc_typehints_format = "short"
 html_theme = "alabaster"
 html_static_path = ["_static"]
 
-intersphinx_mapping = {"python": ("https://docs.python.org/3.10", None)}
+intersphinx_mapping = {"python": ("https://docs.python.org/3.12", None)}
 
 # -- Build environment
 
