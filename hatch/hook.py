@@ -124,8 +124,6 @@ def run_cmake_build(
         str(build_path),
         "--config",
         build_type,
-        "--parallel",
-        str(parallel_jobs),
     ]
     print(f"CMake install: {' '.join(install_cmd)}")
     result = subprocess.run(install_cmd, check=False)
