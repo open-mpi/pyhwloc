@@ -74,14 +74,13 @@ def _chdir(dirname: str) -> Iterator[None]:
         os.chdir(pwd)
 
 
-def build_hwloc_xml() -> str:
+def build_pyhwloc_xml() -> str:
+    """Build and install pyhwloc, returns the path to the doxygen xml files."""
     if sys.platform == "win32":
         raise NotImplementedError("Read the docs environment should be Linux.")
 
     hwloc_version_path = os.path.join(
-        normpath(os.path.dirname(__file__)),
-        os.pardir,
-        os.pardir,
+        PROJECT_ROOT,
         "dev",
         "hwloc_version",
     )
@@ -144,7 +143,7 @@ CURR_PATH = os.path.dirname(os.path.abspath(os.path.expanduser(__file__)))  # so
 PROJECT_ROOT = os.path.normpath(os.path.join(CURR_PATH, os.path.pardir, os.path.pardir))
 
 if is_readthedocs_build():
-    hwloc_xml_path: str | None = build_hwloc_xml()
+    hwloc_xml_path: str | None = build_pyhwloc_xml()
 else:
     hwloc_xml_path = os.environ.get("PYHWLOC_XML_PATH", None)
     if hwloc_xml_path is None:
