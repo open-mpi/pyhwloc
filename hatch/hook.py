@@ -39,7 +39,7 @@ def get_vs_generator() -> str:
     else:
         raise NotImplementedError("Requires visual studio >= 17")
 
-    gen = f"-G{gen}"
+    gen = f"-G{gen[2:]}"  # remove the "* "
     return gen
 
 
