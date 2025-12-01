@@ -29,14 +29,6 @@ Most users should start with the high-level interface and only use the low-level
 specific functionality is missing. Two interfaces can interpolate through the use of the
 ``native_handle`` property.
 
-.. warning::
-
-   This project is still working in progress.
-
-.. warning::
-
-   This document site is temporary, we might migrate in the future.
-
 Quick Start Example
 ===================
 

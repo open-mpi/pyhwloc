@@ -23,19 +23,23 @@ SRC_KEY = "PYHWLOC_HWLOC_SRC_DIR"
 
 def get_vs_generator() -> str:
     """Find the latest visual studio version."""
-    out = subprocess.run(["cmake", "-G"], stdout=subprocess.PIPE)
-    cmake_help = out.stdout.decode()
+    out = subprocess.run(
+        ["cmake", "-G"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    cmake_help = "\n".join([out.stdout.decode(), out.stderr.decode()])
     # ninja doesn't work due to cmake dependency specification.
     # I don't want cmake to pick up mingw somehow.
-    vs2026 = "Visual Studio 18 2026"
-    vs2022 = "Visual Studio 17 2022"
+    vs2026 = "* Visual Studio 18 2026"
+    vs2022 = "* Visual Studio 17 2022"
 
     if vs2026 in cmake_help:
         gen = vs2026
-    else:
+    elif vs2022 in cmake_help:
         gen = vs2022
+    else:
+        raise NotImplementedError("Requires visual studio >= 17")
 
-    gen = f"-G{gen}"
+    gen = f"-G{gen[2:]}"  # remove the "* "
     return gen
 
 
