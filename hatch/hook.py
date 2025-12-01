@@ -29,13 +29,15 @@ def get_vs_generator() -> str:
     cmake_help = "\n".join([out.stdout.decode(), out.stderr.decode()])
     # ninja doesn't work due to cmake dependency specification.
     # I don't want cmake to pick up mingw somehow.
-    vs2026 = "Visual Studio 18 2026"
-    vs2022 = "Visual Studio 17 2022"
+    vs2026 = "* Visual Studio 18 2026"
+    vs2022 = "* Visual Studio 17 2022"
 
     if vs2026 in cmake_help:
         gen = vs2026
-    else:
+    elif vs2022 in cmake_help:
         gen = vs2022
+    else:
+        raise NotImplementedError("Requires visual studio >= 17")
 
     gen = f"-G{gen}"
     return gen
