@@ -1,0 +1,23 @@
+# https://github.com/pypa/manylinux?tab=readme-ov-file#manylinux_2_34-almalinux-9-based---alpha
+# manylinux_2_34 (AlmaLinux 9 based) - ALPHA
+FROM nvcr.io/nvidia/cuda:13.0.1-devel-rockylinux9
+
+RUN \
+    dnf update -y
+
+RUN \
+    dnf -y install dnf-plugins-core && \
+    dnf config-manager --set-enabled devel && \
+    dnf install cmake python3-pip git ninja-build wget -y && \
+    dnf install autoconf automake libtool libpciaccess-devel -y && \
+    rm -rf /var/cache/dnf
+
+RUN \
+    wget -nv -O miniforge3.sh https://github.com/conda-forge/miniforge/releases/download/25.11.0-1/Miniforge3-25.11.0-1-Linux-x86_64.sh
+
+RUN \
+    bash miniforge3.sh -b -p /opt/miniforge
+
+ENV PATH="$PATH:/opt/miniforge/bin"
+
+RUN mamba install hatchling auditwheel patchelf -y

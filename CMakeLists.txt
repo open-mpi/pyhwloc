@@ -53,7 +53,8 @@ if(PYHWLOC_FETCH_HWLOC)
         COMMAND ${hwloc_SOURCE_DIR}/autogen.sh WORKING_DIRECTORY ${hwloc_SOURCE_DIR}
       )
       execute_process(
-        COMMAND ${hwloc_SOURCE_DIR}/configure --enable-plugins --prefix=${PYHWLOC_OUTPUT_DIR}
+	# Use avoid version to NOT create versioned sonames like: libhwloc.so.0.0.0
+        COMMAND ${hwloc_SOURCE_DIR}/configure --enable-plugins --prefix=${PYHWLOC_OUTPUT_DIR} HWLOC_LDFLAGS=-avoid-version
         WORKING_DIRECTORY ${hwloc_BINARY_DIR}
       )
     endif()
@@ -76,7 +77,8 @@ if(PYHWLOC_FETCH_HWLOC)
     set(HWLOC_INCLUDE_DIR ${PYHWLOC_OUTPUT_DIR}/include/)
   else()
     add_custom_command(
-      OUTPUT ${PYHWLOC_OUTPUT_DIR}/lib/libhwloc.so COMMAND make -j${nproc} install WORKING_DIRECTORY ${hwloc_BINARY_DIR}
+      OUTPUT ${PYHWLOC_OUTPUT_DIR}/lib/libhwloc.so
+      COMMAND make -j${nproc} install WORKING_DIRECTORY ${hwloc_BINARY_DIR}
     )
     add_custom_target(install_hwloc DEPENDS ${PYHWLOC_OUTPUT_DIR}/lib/libhwloc.so)
     set(HWLOC_LIBRARY ${PYHWLOC_OUTPUT_DIR}/lib/libhwloc.so)
