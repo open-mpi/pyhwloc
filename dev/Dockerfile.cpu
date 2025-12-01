@@ -18,10 +18,12 @@ RUN \
     git clone https://github.com/doxygen/doxygen.git && \
     cd doxygen && git checkout d49be63057d71f487312f43339516bc92cc685fa && cd -
 
+COPY hwloc_version ws/hwloc_version
+
 RUN \
     cd /ws/ && \
     git clone https://github.com/open-mpi/hwloc.git && \
-    cd hwloc && git checkout 82d8d2c1ad17e0b48f046f997271e45946bd342e && cd -
+    cd hwloc && git checkout $(cat /ws/hwloc_version) && cd -
 
 SHELL ["mamba", "run", "--no-capture-output", "-n", "base", "/bin/bash", "-c"]
 
