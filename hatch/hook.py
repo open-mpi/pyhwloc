@@ -16,6 +16,7 @@ from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 from packaging.tags import platform_tags
 
 FETCH_KEY = "PYHWLOC_FETCH_HWLOC"
+CUDA_KEY = "PYHWLOC_WITH_CUDA"
 BUILD_KEY = "PYHWLOC_BUILD_DIR"
 ROOT_KEY = "PYHWLOC_HWLOC_ROOT_DIR"
 SRC_KEY = "PYHWLOC_HWLOC_SRC_DIR"
@@ -169,8 +170,9 @@ class CMakeBuildHook(BuildHookInterface):
             cmake_args.append(f"-DHWLOC_ROOT={root_dir}")
 
         # No CUDA in RTD
-        if os.environ.get("READTHEDOCS", None) == "True":
-            cmake_args.append("-DPYHWLOC_WITH_CUDA=OFF")
+        with_cuda = os.environ.get(CUDA_KEY, None)
+        if with_cuda == "False":
+            cmake_args.append(f"-D{CUDA_KEY}=OFF")
 
         # Source path
         if os.environ.get(SRC_KEY, None) is not None:

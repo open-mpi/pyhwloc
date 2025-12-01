@@ -125,6 +125,7 @@ cp -r doxygen-doc/xml {pwd}/
                 PROJECT_ROOT,
                 "--config-settings=fetch-hwloc=True",
                 f"--config-settings=hwloc-src-dir={hwloc_src_dir}",
+                "--config-settings=with-cuda=False",
                 "--no-deps",
                 "--no-build-isolation",
             ]
