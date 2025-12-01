@@ -26,7 +26,7 @@ def get_vs_generator() -> str:
     out = subprocess.run(
         ["cmake", "-G"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
-    cmake_help = out.stdout.decode()
+    cmake_help = "\n".join([out.stdout.decode(), out.stderr.decode()])
     # ninja doesn't work due to cmake dependency specification.
     # I don't want cmake to pick up mingw somehow.
     vs2026 = "Visual Studio 18 2026"
