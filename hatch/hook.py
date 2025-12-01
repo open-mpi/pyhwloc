@@ -16,6 +16,7 @@ from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 from packaging.tags import platform_tags
 
 FETCH_KEY = "PYHWLOC_FETCH_HWLOC"
+CUDA_KEY = "PYHWLOC_WITH_CUDA"
 BUILD_KEY = "PYHWLOC_BUILD_DIR"
 ROOT_KEY = "PYHWLOC_HWLOC_ROOT_DIR"
 SRC_KEY = "PYHWLOC_HWLOC_SRC_DIR"
@@ -123,8 +124,6 @@ def run_cmake_build(
         str(build_path),
         "--config",
         build_type,
-        "--parallel",
-        str(parallel_jobs),
     ]
     print(f"CMake install: {' '.join(install_cmd)}")
     result = subprocess.run(install_cmd, check=False)
@@ -167,6 +166,11 @@ class CMakeBuildHook(BuildHookInterface):
             if not os.path.exists(root_dir):
                 raise FileNotFoundError(root_dir)
             cmake_args.append(f"-DHWLOC_ROOT={root_dir}")
+
+        # No CUDA in RTD
+        with_cuda = os.environ.get(CUDA_KEY, None)
+        if with_cuda == "False":
+            cmake_args.append(f"-D{CUDA_KEY}=OFF")
 
         # Source path
         if os.environ.get(SRC_KEY, None) is not None:

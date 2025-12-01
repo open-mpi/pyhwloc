@@ -193,9 +193,10 @@ jobs:
     - name: Install hwloc
       shell: pwsh
       run: |
+        $Env:HWLOC_VERSION = $(cat ./dev/hwloc_version)
         git clone https://github.com/open-mpi/hwloc.git
         cd hwloc
-        git checkout 82d8d2c1ad17e0b48f046f997271e45946bd342e
+        git checkout $Env:HWLOC_VERSION
 
         cd contrib/windows-cmake
         mkdir build

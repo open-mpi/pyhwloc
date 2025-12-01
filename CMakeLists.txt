@@ -8,6 +8,7 @@ project(pyhwloc LANGUAGES C VERSION 0.0.0)
 list(APPEND CMAKE_MODULE_PATH "${pyhwloc_SOURCE_DIR}/cmake/")
 
 option(PYHWLOC_FETCH_HWLOC "Fetch hwloc from GitHub instead of using system version" OFF)
+option(PYHWLOC_WITH_CUDA "Add CUDA-related components" ON)
 
 set(PYHWLOC_BUILD_HWLOC_CMAKE OFF)
 if(WIN32)
@@ -23,10 +24,12 @@ if(PYHWLOC_FETCH_HWLOC)
   set(PYHWLOC_CONFIG_HWLOC OFF CACHE BOOL "")
 
   include(FetchContent)
+  file(READ ${pyhwloc_SOURCE_DIR}/dev/hwloc_version HWLOC_VERSION)
+  message(STATUS "HWLOC_VERSION: ${HWLOC_VERSION}")
   FetchContent_Declare(
     hwloc
     GIT_REPOSITORY https://github.com/open-mpi/hwloc.git
-    GIT_TAG        82d8d2c1ad17e0b48f046f997271e45946bd342e
+    GIT_TAG        ${HWLOC_VERSION}
   )
 
   # Configure hwloc build options
@@ -41,7 +44,7 @@ if(PYHWLOC_FETCH_HWLOC)
         -G ${CMAKE_GENERATOR}
         -DCMAKE_INSTALL_PREFIX=${PYHWLOC_OUTPUT_DIR}
         -DBUILD_SHARED_LIBS=ON
-        -DHWLOC_WITH_CUDA=ON
+        -DHWLOC_WITH_CUDA=${PYHWLOC_WITH_CUDA}
         -DHWLOC_ENABLE_PLUGINS=ON
         WORKING_DIRECTORY ${hwloc_SOURCE_DIR}
       )
@@ -93,26 +96,29 @@ else()
 endif()
 
 message(STATUS "HWLOC_LIBRARY: ${HWLOC_LIBRARY}")
-find_package(CUDAToolkit REQUIRED COMPONENTS nvml cuda_driver cudart_static)
 
 target_link_libraries(pyhwloc PRIVATE ${HWLOC_LIBRARY})
 target_include_directories(pyhwloc PRIVATE ${HWLOC_INCLUDE_DIR})
 list(APPEND PYHWLOC_LIBS pyhwloc)
 
-add_library(pyhwloc_cuda SHARED src/ext/cudr.c)
-target_link_libraries(pyhwloc_cuda PRIVATE CUDA::cuda_driver ${HWLOC_LIBRARY})
-target_include_directories(pyhwloc_cuda PRIVATE ${HWLOC_INCLUDE_DIR})
-list(APPEND PYHWLOC_LIBS pyhwloc_cuda)
+if(PYHWLOC_WITH_CUDA)
+  find_package(CUDAToolkit REQUIRED COMPONENTS nvml cuda_driver cudart_static)
 
-add_library(pyhwloc_cudart SHARED src/ext/cudart.c)
-target_link_libraries(pyhwloc_cudart PRIVATE CUDA::cudart ${HWLOC_LIBRARY})
-target_include_directories(pyhwloc_cudart PRIVATE ${HWLOC_INCLUDE_DIR})
-list(APPEND PYHWLOC_LIBS pyhwloc_cudart)
+  add_library(pyhwloc_cuda SHARED src/ext/cudr.c)
+  target_link_libraries(pyhwloc_cuda PRIVATE CUDA::cuda_driver ${HWLOC_LIBRARY})
+  target_include_directories(pyhwloc_cuda PRIVATE ${HWLOC_INCLUDE_DIR})
+  list(APPEND PYHWLOC_LIBS pyhwloc_cuda)
 
-add_library(pyhwloc_nvml SHARED src/ext/nvml.c)
-target_link_libraries(pyhwloc_nvml PRIVATE CUDA::nvml ${HWLOC_LIBRARY})
-target_include_directories(pyhwloc_nvml PRIVATE ${HWLOC_INCLUDE_DIR})
-list(APPEND PYHWLOC_LIBS pyhwloc_nvml)
+  add_library(pyhwloc_cudart SHARED src/ext/cudart.c)
+  target_link_libraries(pyhwloc_cudart PRIVATE CUDA::cudart ${HWLOC_LIBRARY})
+  target_include_directories(pyhwloc_cudart PRIVATE ${HWLOC_INCLUDE_DIR})
+  list(APPEND PYHWLOC_LIBS pyhwloc_cudart)
+
+  add_library(pyhwloc_nvml SHARED src/ext/nvml.c)
+  target_link_libraries(pyhwloc_nvml PRIVATE CUDA::nvml ${HWLOC_LIBRARY})
+  target_include_directories(pyhwloc_nvml PRIVATE ${HWLOC_INCLUDE_DIR})
+  list(APPEND PYHWLOC_LIBS pyhwloc_nvml)
+endif()
 
 include(GenerateExportHeader)
 

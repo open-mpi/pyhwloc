@@ -32,6 +32,7 @@ classifiers=[
 
 [project.urls]
 source = "https://github.com/open-mpi/pyhwloc"
+documentation = "https://pyhwloc.readthedocs.io/"
 
 [tool.hatch.version]
 path = "src/pyhwloc/hwloc/__init__.py"
