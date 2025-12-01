@@ -23,7 +23,9 @@ SRC_KEY = "PYHWLOC_HWLOC_SRC_DIR"
 
 def get_vs_generator() -> str:
     """Find the latest visual studio version."""
-    out = subprocess.run(["cmake", "-G"], stdout=subprocess.PIPE)
+    out = subprocess.run(
+        ["cmake", "-G"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     cmake_help = out.stdout.decode()
     # ninja doesn't work due to cmake dependency specification.
     # I don't want cmake to pick up mingw somehow.
