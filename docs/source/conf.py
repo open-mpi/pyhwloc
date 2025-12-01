@@ -107,6 +107,8 @@ HWLOC_DOXYGEN_GENERATE_XML=YES doxygen ./doxygen.cfg
 
 # Copy and cleanup
 cp -r doxygen-doc/xml {pwd}/
+cd ..
+git clean -xdf
 """
         script_path = os.path.join(tmpdir, "build_xml.sh")
         with open(script_path, "w") as fd:
