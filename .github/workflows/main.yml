@@ -43,7 +43,7 @@ jobs:
       image: ghcr.io/trivialfis/pyhwloc:latest
       credentials:
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ secrets.GHCR_PYHWLOC }}
     steps:
     - name: Trust git cloning project sources
       run: |
