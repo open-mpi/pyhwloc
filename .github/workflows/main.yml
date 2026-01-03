@@ -1,6 +1,6 @@
 name: pyhwloc CI
 
-on: [push]
+on: [push, pull_request]
 
 permissions:
   contents: read  # to fetch code (actions/checkout)
@@ -18,7 +18,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6.0.1
       with:
         submodules: false
     - uses: actions/setup-python@v5
@@ -60,7 +60,7 @@ jobs:
         make install
         cd /ws
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6.0.1
       with:
         submodules: false
 
@@ -116,7 +116,7 @@ jobs:
         python dev/check_plugins.py
 
     - name: Upload binary wheel
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: Linux-Fat-wheel
         path: dist/pyhwloc-*.whl
@@ -155,7 +155,7 @@ jobs:
       matrix:
         os: [windows-latest]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6.0.1
       with:
         submodules: false
     - uses: dmlc/xgboost-devops/actions/miniforge-setup@main
@@ -167,7 +167,7 @@ jobs:
       shell: pwsh
       run: |
         pip wheel -v . --no-build-isolation --no-deps --wheel-dir dist --config-settings=fetch-hwloc=True
-        pip install .\dist\pyhwloc-0.0.0.dev0-py3-none-win_amd64.whl
+        pip install .\dist\pyhwloc-3.0.0.dev0-py3-none-win_amd64.whl
 
         python -c "from pyhwloc import Topology"
 
@@ -217,7 +217,7 @@ jobs:
       shell: pwsh
       run: |
         pip wheel -v . --no-build-isolation --no-deps --wheel-dir dist --config-settings=hwloc-root-dir="$Env:CONDA_PREFIX"
-        pip install .\dist\pyhwloc-0.0.0.dev0-py3-none-win_amd64.whl
+        pip install .\dist\pyhwloc-3.0.0.dev0-py3-none-win_amd64.whl
         python -c "from pyhwloc import Topology"
         git clean -xdf
         pip uninstall pyhwloc -y
