@@ -116,7 +116,7 @@ jobs:
         python dev/check_plugins.py
 
     - name: Upload binary wheel
-      uses: actions/upload-artifact@v6.0.1
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: Linux-Fat-wheel
         path: dist/pyhwloc-*.whl
