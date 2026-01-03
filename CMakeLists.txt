@@ -3,7 +3,7 @@
 set(CMAKE_POLICY_DEFAULT_CMP0144 NEW)
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
-project(pyhwloc LANGUAGES C VERSION 0.0.0)
+project(pyhwloc LANGUAGES C VERSION 3.0.0)
 
 list(APPEND CMAKE_MODULE_PATH "${pyhwloc_SOURCE_DIR}/cmake/")
 
