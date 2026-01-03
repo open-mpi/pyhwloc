@@ -57,4 +57,4 @@ Currently, the image is private. To use the image for GitHub action:
 
 - Create a read-only PAT (classic, `read:packages`).
 - Store it as project secret in the project's settings tab: `Settings -> Secrets and Variables -> Actions`.
-- Refer to the name of the secret in GitHub action container configurations.
+- Use the `secrets.GITHUB_TOKEN` to access it in a workflow.
