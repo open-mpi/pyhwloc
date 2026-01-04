@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 permissions:
   contents: read  # to fetch code (actions/checkout)
+  packages: read  # to fetch the container image
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -40,10 +41,10 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     container:
-      image: ghcr.io/trivialfis/pyhwloc:latest
+      image: ghcr.io/open-mpi/pyhwloc:latest
       credentials:
         username: ${{ github.actor }}
-        password: ${{ secrets.GHCR_PYHWLOC }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Trust git cloning project sources
       run: |
