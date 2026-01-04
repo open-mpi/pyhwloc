@@ -1,13 +1,15 @@
-# Copyright (c) 2025, NVIDIA CORPORATION.
+# Copyright (c) 2025-2026, NVIDIA CORPORATION.
 # SPDX-License-Identifier: BSD-3-Clause
 from __future__ import annotations
 
 import pytest
 
 from pyhwloc.bitmap import Bitmap
+from pyhwloc.hwloc.lib import _IS_V3
 from pyhwloc.topology import Topology
 
 
+@pytest.mark.skipif(condition=not _IS_V3, reason="Not implemented for V2.")
 def test_cpukinds() -> None:
     desc = (
         "Package:1 [NUMANode(memory=134228295680)] Die:2 L3Cache:1(size=100663296) "

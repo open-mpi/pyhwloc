@@ -2542,9 +2542,17 @@ def bridge_covers_pcibus(bridge: ObjPtr, domain: int, bus: int) -> int:
 #############################
 
 
-@_cenumdoc("hwloc_topology_export_xml_flags_e")
-class ExportXmlFlags(IntEnum):
-    V2 = 1 << 1
+if _IS_V3:
+
+    @_cenumdoc("hwloc_topology_export_xml_flags_e")
+    class ExportXmlFlags(IntEnum):
+        V2 = 1 << 1
+
+else:
+
+    @_cenumdoc("hwloc_topology_export_xml_flags_e")
+    class ExportXmlFlags(IntEnum):  # type: ignore[no-redef]
+        V1 = 1 << 0
 
 
 _LIB.hwloc_topology_export_xml.argtypes = [topology_t, ctypes.c_char_p, ctypes.c_ulong]

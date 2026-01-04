@@ -493,8 +493,14 @@ def test_bridge_covers_pcibus() -> None:
 
 def test_topology_export_xmlbuffer() -> None:
     topo = Topology()
-    result = topology_export_xmlbuffer(topo.hdl, ExportXmlFlags.V2)
-    assert """<!DOCTYPE topology SYSTEM "hwloc2.dtd">""" in result
+    if _IS_V3:
+        result = topology_export_xmlbuffer(topo.hdl, ExportXmlFlags.V2)
+        assert """<!DOCTYPE topology SYSTEM "hwloc2.dtd">""" in result
+    else:
+        result = topology_export_xmlbuffer(
+            topo.hdl, ExportXmlFlags.V1  # type: ignore[attr-defined]
+        )
+        assert """<!DOCTYPE topology SYSTEM "hwloc.dtd">""" in result
 
 
 ###################################

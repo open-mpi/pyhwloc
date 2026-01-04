@@ -167,7 +167,17 @@ def test_copy_export() -> None:
             == topo.export_xml_buffer(0)
             == dcp.export_xml_buffer(0)
         )
-        assert len(cp.export_xml_buffer(ExportXmlFlags.V2)) > 2
+        if _IS_V3:
+            assert len(cp.export_xml_buffer(ExportXmlFlags.V2)) > 2
+        else:
+            assert (
+                len(
+                    cp.export_xml_buffer(
+                        ExportXmlFlags.V1  # type: ignore[attr-defined]
+                    )
+                )
+                > 2
+            )
     finally:
         topo.destroy()
         cp.destroy()
