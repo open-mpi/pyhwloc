@@ -29,15 +29,16 @@ RUN \
 
 RUN \
     case $TARGETPLATFORM in \
-        linux/amd64) \
+        linux/amd64)        \
             wget -nv -O miniforge3.sh https://github.com/conda-forge/miniforge/releases/download/25.11.0-1/Miniforge3-25.11.0-1-Linux-x86_64.sh \
-            ;; \
-        linux/arm64) \
+            ;;              \
+        linux/arm64)        \
             wget -nv -O miniforge3.sh https://github.com/conda-forge/miniforge/releases/download/25.11.0-1/Miniforge3-25.11.0-1-Linux-aarch64.sh \
-            ;; \
-        *) \
-	    exit -1 \
-	    ;; \
+            ;;              \
+        *)                  \
+            echo "Invalid platform." \
+            exit -1         \
+            ;;              \
     esac
 
 RUN \
