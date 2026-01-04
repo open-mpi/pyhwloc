@@ -1,4 +1,4 @@
-# Copyright (c) 2025, NVIDIA CORPORATION.
+# Copyright (c) 2025-2026, NVIDIA CORPORATION.
 # SPDX-License-Identifier: BSD-3-Clause
 """
 Core API
@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING, Callable
 
 from .bitmap import bitmap_alloc, bitmap_t, const_bitmap_t
 from .lib import (
+    _IS_V3,
     _LIB,
     HwLocError,
     _cenumdoc,
@@ -26,6 +27,7 @@ from .lib import (
     _PrintableStruct,
     _pyhwloc_lib,
 )
+from .lib import get_api_version as get_api_ver
 from .libc import strerror as _strerror
 
 hwloc_uint64_t = ctypes.c_uint64
@@ -36,15 +38,12 @@ HWLOC_UNKNOWN_INDEX = ctypes.c_uint(-1).value
 # API version
 #############
 
-# https://www.open-mpi.org/projects/hwloc/doc/v2.12.1/a00138.php
-
-
-_LIB.hwloc_get_api_version.restype = ctypes.c_uint
+# https://www.open-mpi.org/projects/hwloc/doc/v2.12.2/group__hwlocality__api__version.html
 
 
 @_cfndoc
-def get_api_version() -> int:
-    return int(_LIB.hwloc_get_api_version())
+def get_api_version() -> tuple[int, int, int]:
+    return get_api_ver()
 
 
 ##################################################
@@ -713,19 +712,26 @@ def type_sscanf_as_depth(string: str, topology: topology_t) -> tuple[ObjType, in
 # https://www.open-mpi.org/projects/hwloc/doc/v2.12.1/a00145.php
 
 
-_pyhwloc_lib.pyhwloc_get_info_by_name.argtypes = [
-    ctypes.POINTER(Infos),
-    ctypes.c_char_p,
-]
-_pyhwloc_lib.pyhwloc_get_info_by_name.restype = ctypes.c_char_p
+if _IS_V3:
+    _pyhwloc_lib.pyhwloc_get_info_by_name.argtypes = [
+        ctypes.POINTER(Infos),
+        ctypes.c_char_p,
+    ]
+    _pyhwloc_lib.pyhwloc_get_info_by_name.restype = ctypes.c_char_p
+else:
+    _pyhwloc_lib.pyhwloc_obj_get_info_by_name.argtypes = [obj_t, ctypes.c_char_p]
+    _pyhwloc_lib.pyhwloc_obj_get_info_by_name.restype = ctypes.c_char_p
 
 
 @_cfndoc
 def obj_get_info_by_name(obj: ObjPtr, name: str) -> str | None:
     name_bytes = name.encode("utf-8")
-    result = _pyhwloc_lib.pyhwloc_get_info_by_name(
-        ctypes.byref(obj.contents.infos), name_bytes
-    )
+    if _IS_V3:
+        result = _pyhwloc_lib.pyhwloc_get_info_by_name(
+            ctypes.byref(obj.contents.infos), name_bytes
+        )
+    else:
+        result = _pyhwloc_lib.pyhwloc_obj_get_info_by_name(obj, name_bytes)
     if result:
         return result.decode("utf-8")
     return None

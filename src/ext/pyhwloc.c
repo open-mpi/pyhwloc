@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, NVIDIA CORPORATION.
+ * Copyright (c) 2025-2026, NVIDIA CORPORATION.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -60,10 +60,22 @@ PYHWLOC_EXPORT int pyhwloc_obj_add_info(hwloc_obj_t obj, const char *name,
   return hwloc_obj_add_info(obj, name, value);
 }
 
+#define HWLOC_API_VERSION_MAJOR (HWLOC_API_VERSION >> 16)
+
+#if HWLOC_API_VERSION_MAJOR >= 3
 PYHWLOC_EXPORT char const *pyhwloc_get_info_by_name(struct hwloc_infos_s *infos,
                                                     const char *name) {
+
   return hwloc_get_info_by_name(infos, name);
 }
+#elif HWLOC_API_VERSION_MAJOR >= 2
+PYHWLOC_EXPORT char const *pyhwloc_obj_get_info_by_name(hwloc_obj_t obj,
+                                                        const char *name) {
+  return hwloc_obj_get_info_by_name(obj, name);
+}
+#else
+/* nothing, should lead to a missing symbol error in Python. */
+#endif
 
 // Finding I/O objects
 PYHWLOC_EXPORT hwloc_obj_t pyhwloc_get_non_io_ancestor_obj(

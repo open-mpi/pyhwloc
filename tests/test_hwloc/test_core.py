@@ -1,4 +1,4 @@
-# Copyright (c) 2025, NVIDIA CORPORATION.
+# Copyright (c) 2025-2026, NVIDIA CORPORATION.
 # SPDX-License-Identifier: BSD-3-Clause
 from __future__ import annotations
 
@@ -94,9 +94,9 @@ from pyhwloc.hwloc.lib import HwLocError
 
 
 def test_get_api_version() -> None:
-    version = get_api_version()
-    assert isinstance(version, int)
-    assert version > 0
+    major, minor, patch = get_api_version()
+    assert isinstance(major, int)
+    assert major >= 2
 
 
 ##############
@@ -506,7 +506,8 @@ def test_topology_export_synthetic() -> None:
     flags = ExFlags.NO_EXTENDED_TYPES
     topology_export_synthetic(topo.hdl, c_buf, len(buf), flags)
     result = buf.decode("utf-8")
-    assert "Package" in result
+    # V3 is Package, V2 is Socket
+    assert "Package" in result or "Socket" in result
 
 
 ####################

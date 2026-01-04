@@ -1,4 +1,4 @@
-# Copyright (c) 2025, NVIDIA CORPORATION.
+# Copyright (c) 2025-2026, NVIDIA CORPORATION.
 # SPDX-License-Identifier: BSD-3-Clause
 from __future__ import annotations
 
@@ -208,3 +208,21 @@ def libinfo() -> dict[str, Any]:
         plugins = os.listdir(plugins_path)
         info["plugins"] = plugins
     return info
+
+
+_LIB.hwloc_get_api_version.restype = ctypes.c_uint
+
+
+def _get_api_version() -> int:
+    return int(_LIB.hwloc_get_api_version())
+
+
+def get_api_version() -> tuple[int, int, int]:
+    v = _get_api_version()
+    major = v >> 16
+    minor = (v >> 8) & 0xFF
+    rev = v & 0xFF
+    return major, minor, rev
+
+
+_IS_V3 = get_api_version()[0] >= 3

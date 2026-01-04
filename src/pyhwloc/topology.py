@@ -1,4 +1,4 @@
-# Copyright (c) 2025, NVIDIA CORPORATION.
+# Copyright (c) 2025-2026, NVIDIA CORPORATION.
 # SPDX-License-Identifier: BSD-3-Clause
 """
 The Topology Interface
@@ -1243,16 +1243,12 @@ class Topology:
 
 @_reuse_doc(_core.get_api_version)
 def get_api_version() -> tuple[int, int, int]:
-    v = _core.get_api_version()
-    major = v >> 16
-    minor = (v >> 8) & 0xFF
-    rev = v & 0xFF
-    return major, minor, rev
+    return _core.get_api_version()
 
 
 if not _lib._IS_DOC_BUILD:
     _major, _minor, _rev = get_api_version()
-    if not (_major == 3 and _minor == 0 and _rev == 0):
+    if not ((_major == 3 and _minor == 0 and _rev == 0) or _major == 2):
         raise RuntimeError(
             "Invalid API version. You have installed a different version of hwloc. "
             f"Expecting API version: 3.0.0, got {_major}.{_minor}.{_rev}) ."
