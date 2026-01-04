@@ -1,4 +1,4 @@
-# Copyright (c) 2025, NVIDIA CORPORATION.
+# Copyright (c) 2025-2026, NVIDIA CORPORATION.
 # SPDX-License-Identifier: BSD-3-Clause
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import pickle
 
 import pytest
 
+from pyhwloc.hwloc.lib import _IS_V3
 from pyhwloc.hwobject import Object, ObjType
 from pyhwloc.topology import Topology
 
@@ -179,5 +180,6 @@ def test_info() -> None:
         obj = topo.get_root_obj()
         obj.add_info("Foo0", "Bar0")
         obj.add_info("Foo1", "Bar1")
-        info = obj.info
-        assert info == {"Foo0": "Bar0", "Foo1": "Bar1"}
+        if _IS_V3:
+            info = obj.info
+            assert info == {"Foo0": "Bar0", "Foo1": "Bar1"}

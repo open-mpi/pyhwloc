@@ -90,7 +90,7 @@ from pyhwloc.hwloc.core import (
     type_sscanf,
     type_sscanf_as_depth,
 )
-from pyhwloc.hwloc.lib import HwLocError
+from pyhwloc.hwloc.lib import _IS_V3, HwLocError
 
 
 def test_get_api_version() -> None:
@@ -168,6 +168,11 @@ def test_topology_get_infos() -> None:
 
     topology_set_io_types_filter(topo, TypeFilter.KEEP_IMPORTANT)
     topology_load(topo)
+
+    if not _IS_V3:
+        with pytest.raises(NotImplementedError, match="Only valid"):
+            infos = topology_get_infos(topo)
+        return
 
     infos = topology_get_infos(topo)
 
@@ -488,8 +493,14 @@ def test_bridge_covers_pcibus() -> None:
 
 def test_topology_export_xmlbuffer() -> None:
     topo = Topology()
-    result = topology_export_xmlbuffer(topo.hdl, ExportXmlFlags.V2)
-    assert """<!DOCTYPE topology SYSTEM "hwloc2.dtd">""" in result
+    if _IS_V3:
+        result = topology_export_xmlbuffer(topo.hdl, ExportXmlFlags.V2)
+        assert """<!DOCTYPE topology SYSTEM "hwloc2.dtd">""" in result
+    else:
+        result = topology_export_xmlbuffer(
+            topo.hdl, ExportXmlFlags.V1  # type: ignore[attr-defined]
+        )
+        assert """<!DOCTYPE topology SYSTEM "hwloc.dtd">""" in result
 
 
 ###################################
@@ -523,6 +534,7 @@ def test_cpukinds_get_info() -> None:
     assert nr_kinds >= 0
 
 
+@pytest.mark.skipif(condition=not _IS_V3, reason="Not implemented for V2.")
 def test_cpukinds_register_and_get_functions() -> None:
     topo = Topology()
 
@@ -574,6 +586,7 @@ def test_cpukinds_register_and_get_functions() -> None:
     )
 
 
+@pytest.mark.skipif(condition=not _IS_V3, reason="Not implemented for V2.")
 def test_cpukinds_register_empty_infos() -> None:
     topo = Topology()
 
