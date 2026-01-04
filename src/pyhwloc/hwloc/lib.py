@@ -43,6 +43,8 @@ else:
     _search_name = os.path.join(_lib_path, "lib", _get_libname("hwloc"))
 
 if os.path.exists(_search_name):
+    # The hwloc is bundled with pyhwloc
+    os.environ["HWLOC_PLUGINS_PATH"] = os.path.join(_lib_path, "lib", "hwloc")
     _hwloc_lib_name = _search_name
 else:
     # Dynamically find hwloc library at runtime

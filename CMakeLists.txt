@@ -112,7 +112,7 @@ if(PYHWLOC_WITH_CUDA)
   list(APPEND PYHWLOC_LIBS pyhwloc_cuda)
 
   add_library(pyhwloc_cudart SHARED src/ext/cudart.c)
-  target_link_libraries(pyhwloc_cudart PRIVATE CUDA::cudart ${HWLOC_LIBRARY})
+  target_link_libraries(pyhwloc_cudart PRIVATE CUDA::cudart_static ${HWLOC_LIBRARY})
   target_include_directories(pyhwloc_cudart PRIVATE ${HWLOC_INCLUDE_DIR})
   list(APPEND PYHWLOC_LIBS pyhwloc_cudart)
 
