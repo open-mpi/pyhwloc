@@ -32,3 +32,12 @@ RUN \
 ENV PATH="$PATH:/opt/miniforge/bin"
 
 RUN mamba install hatchling auditwheel patchelf -y
+
+# Build the image:
+# docker build . -f ./dev/Dockerfile.manylinux_2_34 -t pyhwloc-manylinux_2_34:latest
+
+# Build the wheel:
+# docker run --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws cuda-13-manylinux:latest -- python -m pip wheel -v . --config-settings=fetch-hwloc=True --wheel-dir dist/
+
+# Audit teh wheel:
+# docker run --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws cuda-13-manylinux:latest -- auditwheel repair --only-plat --plat ${WHEEL_TAG} ./dist/*.whl
