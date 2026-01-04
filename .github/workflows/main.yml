@@ -40,7 +40,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     container:
-      image: ghcr.io/trivialfis/pyhwloc:latest
+      image: ghcr.io/open-mpi/pyhwloc:latest
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GHCR_PYHWLOC }}
