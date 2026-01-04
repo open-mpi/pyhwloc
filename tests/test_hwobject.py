@@ -180,6 +180,6 @@ def test_info() -> None:
         obj = topo.get_root_obj()
         obj.add_info("Foo0", "Bar0")
         obj.add_info("Foo1", "Bar1")
-        if _IS_V3:
-            info = obj.info
-            assert info == {"Foo0": "Bar0", "Foo1": "Bar1"}
+        info = obj.info
+        assert info["Foo0"] == "Bar0"
+        assert info["Foo1"] == "Bar1"

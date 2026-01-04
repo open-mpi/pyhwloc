@@ -166,7 +166,7 @@ def compare_types(type1: ObjType, type2: ObjType) -> int:
 # https://www.open-mpi.org/projects/hwloc/doc/v2.12.1/a00141.php
 
 
-# The info_s and infs_s are dictionary in Python.
+# The info_s and infos_s are dictionaries in Python.
 
 
 @_cstructdoc("hwloc_info_s")
@@ -192,16 +192,6 @@ else:
     InfosPtr = ctypes._Pointer
 
 
-if not _IS_V3:
-
-    @_cstructdoc("hwloc_memory_page_type_s", parent="hwloc_obj_attr_u")
-    class MemoryPageType(_PrintableStruct):
-        _fields_ = [
-            ("size", hwloc_uint64_t),  # Size of pages
-            ("count", hwloc_uint64_t),  # Number of pages of this size
-        ]
-
-
 if _IS_V3:
 
     @_cstructdoc("hwloc_numanode_attr_s", parent="hwloc_obj_attr_u")
@@ -211,6 +201,13 @@ if _IS_V3:
         ]
 
 else:
+
+    @_cstructdoc("hwloc_memory_page_type_s", parent="hwloc_obj_attr_u")
+    class MemoryPageType(_PrintableStruct):
+        _fields_ = [
+            ("size", hwloc_uint64_t),  # Size of pages
+            ("count", hwloc_uint64_t),  # Number of pages of this size
+        ]
 
     @_cstructdoc("hwloc_numanode_attr_s", parent="hwloc_obj_attr_u")
     class NumanodeAttr(_PrintableStruct):  # type: ignore[no-redef]
@@ -3519,14 +3516,25 @@ def cpukinds_get_by_cpuset(topology: topology_t, cpuset: const_bitmap_t) -> int:
     return result
 
 
-_LIB.hwloc_cpukinds_get_info.argtypes = [
-    topology_t,
-    ctypes.c_uint,
-    bitmap_t,
-    ctypes.POINTER(ctypes.c_int),
-    ctypes.POINTER(ctypes.POINTER(Infos)),
-    ctypes.c_ulong,
-]
+if _IS_V3:
+    _LIB.hwloc_cpukinds_get_info.argtypes = [
+        topology_t,
+        ctypes.c_uint,
+        bitmap_t,
+        ctypes.POINTER(ctypes.c_int),
+        ctypes.POINTER(ctypes.POINTER(Infos)),
+        ctypes.c_ulong,
+    ]
+else:
+    _LIB.hwloc_cpukinds_get_info.argtypes = [
+        topology_t,
+        ctypes.c_uint,
+        bitmap_t,
+        ctypes.POINTER(ctypes.c_int),
+        ctypes.POINTER(ctypes.c_uint),
+        ctypes.POINTER(ctypes.POINTER(Info)),
+        ctypes.c_ulong,
+    ]
 _LIB.hwloc_cpukinds_get_info.restype = ctypes.c_int
 
 
@@ -3538,17 +3546,19 @@ def cpukinds_get_info(
     efficiency = ctypes.c_int()
     infos_ptr = ctypes.POINTER(Infos)()
     # flags must be 0 for now.
-    _checkc(
-        _LIB.hwloc_cpukinds_get_info(
-            topology,
-            kind_index,
-            cpuset,
-            ctypes.byref(efficiency),
-            ctypes.byref(infos_ptr),
-            0,
+    if _IS_V3:
+        _checkc(
+            _LIB.hwloc_cpukinds_get_info(
+                topology,
+                kind_index,
+                cpuset,
+                ctypes.byref(efficiency),
+                ctypes.byref(infos_ptr),
+                0,
+            )
         )
-    )
-
+    else:
+        raise NotImplementedError("Only valid in v3.")
     return cpuset, efficiency.value, infos_ptr
 
 

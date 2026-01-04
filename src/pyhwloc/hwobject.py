@@ -19,7 +19,15 @@ from typing import TYPE_CHECKING, Iterator, Protocol, TypeAlias, cast
 from .bitmap import Bitmap
 from .hwloc import core as _core
 from .hwloc.lib import _IS_V3
-from .utils import PciId, _Flags, _get_info, _or_flags, _reuse_doc, _TopoRefMixin
+from .utils import (
+    PciId,
+    _Flags,
+    _get_info,
+    _get_info_v2,
+    _or_flags,
+    _reuse_doc,
+    _TopoRefMixin,
+)
 
 if TYPE_CHECKING:
     from .utils import _TopoRef
@@ -437,7 +445,12 @@ class Object(_TopoRefMixin):
     def info(self) -> dict[str, str]:
         """Get the object info."""
         infos = self.native_handle.contents.infos
-        infos_d = _get_info(infos)
+        if _IS_V3:
+            infos_v3 = infos
+        else:
+            info_cnt = self.native_handle.contents.infos_count
+            infos_v3 = _core.Infos(array=infos, count=info_cnt, allocated=0)
+        infos_d = _get_info(infos_v3)
 
         return infos_d
 

@@ -118,14 +118,24 @@ class _TopoRefMixin:
         return v
 
 
-def _get_info(infos: _core.Infos) -> dict[str, str]:
+if TYPE_CHECKING:
+    _InfoPtr: TypeAlias = ctypes._Pointer[_core.Info]
+else:
+    _InfoPtr: TypeAlias = ctypes._Pointer
+
+
+def _get_info_v2(infos: _InfoPtr, cnt: int) -> dict[str, str]:
     infos_d = {}
-    for i in range(infos.count):
-        info = infos.array[i]
+    for i in range(cnt):
+        info = infos[i]
         name = info.name.decode("utf-8") if info.name else ""
         value = info.value.decode("utf-8") if info.value else ""
         infos_d[name] = value
     return infos_d
+
+
+def _get_info(infos: _core.Infos) -> dict[str, str]:
+    return _get_info_v2(infos.array, infos.count)
 
 
 @dataclass
