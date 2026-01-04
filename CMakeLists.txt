@@ -53,7 +53,7 @@ if(PYHWLOC_FETCH_HWLOC)
         COMMAND ${hwloc_SOURCE_DIR}/autogen.sh WORKING_DIRECTORY ${hwloc_SOURCE_DIR}
       )
       execute_process(
-	# Use avoid version to NOT create versioned sonames like: libhwloc.so.0.0.0
+        # Use avoid version to NOT create versioned sonames like: libhwloc.so.0.0.0
         COMMAND ${hwloc_SOURCE_DIR}/configure --enable-plugins --prefix=${PYHWLOC_OUTPUT_DIR} HWLOC_LDFLAGS=-avoid-version
         WORKING_DIRECTORY ${hwloc_BINARY_DIR}
       )
