@@ -51,6 +51,11 @@ To create the initial GitHub package for PyHwloc:
 - Create a personal access token (classic) in the GitHub `developer settings <https://github.com/settings/tokens>`__, with write access (`write:packages`) to the GitHub package.
 - Log in with docker.
 - Build the container image as described in the building from source document, use the tag ``ghcr.io/open-mpi/pyhwloc:latest``.
+
+.. code-block:: sh
+
+    docker build --progress=plain . -f ./Dockerfile.cpu --build-arg HWLOC_MAJOR=2 -t ghcr.io/open-mpi/pyhwloc:v2.12.2
+
 - Push the image and find the package in https://github.com/orgs/open-mpi/packages
 
 Currently, the image is private. To use the image for GitHub action:

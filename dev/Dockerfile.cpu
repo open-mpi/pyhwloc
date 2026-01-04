@@ -1,5 +1,6 @@
 # Stage 1: Builder stage with doxygen and build dependencies
 FROM condaforge/miniforge3:25.3.1-0 AS builder
+ARG HWLOC_MAJOR
 
 RUN set -x \
     # basic dependencies
@@ -19,11 +20,11 @@ RUN \
     cd doxygen && git checkout d49be63057d71f487312f43339516bc92cc685fa && cd -
 
 COPY hwloc_version ws/hwloc_version
+COPY hwloc_version_v2 ws/hwloc_version_v2
+COPY clone_hwloc.sh ws/clone_hwloc.sh
 
 RUN \
-    cd /ws/ && \
-    git clone https://github.com/open-mpi/hwloc.git && \
-    cd hwloc && git checkout $(cat /ws/hwloc_version) && cd -
+    cd /ws/ && ./clone_hwloc.sh
 
 SHELL ["mamba", "run", "--no-capture-output", "-n", "base", "/bin/bash", "-c"]
 
