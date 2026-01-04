@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 permissions:
   contents: read  # to fetch code (actions/checkout)
+  packages: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
