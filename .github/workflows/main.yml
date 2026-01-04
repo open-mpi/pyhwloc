@@ -43,7 +43,7 @@ jobs:
       image: ghcr.io/open-mpi/pyhwloc:latest
       credentials:
         username: ${{ github.actor }}
-        password: ${{ secrets.GHCR_PYHWLOC }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Trust git cloning project sources
       run: |
