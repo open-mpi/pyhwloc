@@ -186,7 +186,7 @@ jobs:
       shell: pwsh
       run: |
         pip wheel -v . --no-build-isolation --no-deps --wheel-dir dist --config-settings=fetch-hwloc=True
-        pip install .\dist\pyhwloc-3.0.0.dev0-py3-none-win_amd64.whl
+        pip install .\dist\pyhwloc-*-py3-none-win_amd64.whl
 
         python -c "from pyhwloc import Topology"
 
@@ -236,7 +236,7 @@ jobs:
       shell: pwsh
       run: |
         pip wheel -v . --no-build-isolation --no-deps --wheel-dir dist --config-settings=hwloc-root-dir="$Env:CONDA_PREFIX"
-        pip install .\dist\pyhwloc-3.0.0.dev0-py3-none-win_amd64.whl
+        pip install .\dist\pyhwloc-*-py3-none-win_amd64.whl
         python -c "from pyhwloc import Topology"
         git clean -xdf
         pip uninstall pyhwloc -y
