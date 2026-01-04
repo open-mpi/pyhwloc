@@ -1,5 +1,19 @@
 # https://github.com/pypa/manylinux?tab=readme-ov-file#manylinux_2_34-almalinux-9-based---alpha
 # manylinux_2_34 (AlmaLinux 9 based) - ALPHA
+#
+# This image is used for building portable binary wheels for linux. It doesn't contain any
+# dependencies for building document or running tests.
+#
+# Build the image:
+#   docker build . -f ./dev/Dockerfile.manylinux_2_34 -t pyhwloc-manylinux_2_34:latest
+#
+# Build the wheel:
+#   docker run --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws cuda-13-manylinux:latest -- python -m pip wheel -v . --config-settings=fetch-hwloc=True --wheel-dir dist/
+#
+# Audit the wheel:
+#   docker run --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws cuda-13-manylinux:latest -- auditwheel repair --only-plat --plat ${WHEEL_TAG} ./dist/*.whl
+
+
 FROM nvcr.io/nvidia/cuda:13.0.1-devel-rockylinux9
 ARG TARGETPLATFORM
 
@@ -32,12 +46,3 @@ RUN \
 ENV PATH="$PATH:/opt/miniforge/bin"
 
 RUN mamba install hatchling auditwheel patchelf -y
-
-# Build the image:
-# docker build . -f ./dev/Dockerfile.manylinux_2_34 -t pyhwloc-manylinux_2_34:latest
-
-# Build the wheel:
-# docker run --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws cuda-13-manylinux:latest -- python -m pip wheel -v . --config-settings=fetch-hwloc=True --wheel-dir dist/
-
-# Audit teh wheel:
-# docker run --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws cuda-13-manylinux:latest -- auditwheel repair --only-plat --plat ${WHEEL_TAG} ./dist/*.whl
