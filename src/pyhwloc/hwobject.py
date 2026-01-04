@@ -23,7 +23,6 @@ from .utils import (
     PciId,
     _Flags,
     _get_info,
-    _get_info_v2,
     _or_flags,
     _reuse_doc,
     _TopoRefMixin,

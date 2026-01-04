@@ -7,7 +7,7 @@ import pickle
 import pytest
 
 from pyhwloc.hwloc.lib import _IS_V3
-from pyhwloc.hwobject import Object, ObjType
+from pyhwloc.hwobject import NumaNode, Object, ObjType
 from pyhwloc.topology import Topology
 
 
@@ -183,3 +183,12 @@ def test_info() -> None:
         info = obj.info
         assert info["Foo0"] == "Bar0"
         assert info["Foo1"] == "Bar1"
+
+
+@pytest.mark.skipif(condition=_IS_V3, reason="Removed in V3.")
+def test_numa_node() -> None:
+    with Topology.from_synthetic("node:2 core:2 pu:2") as topo:
+        numa = topo.get_obj_by_type(ObjType.NUMANODE, 0)
+        assert numa is not None and numa.is_numa_node()
+        assert isinstance(numa, NumaNode)
+        assert numa.page_types[0].size > 0
