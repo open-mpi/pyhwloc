@@ -24,6 +24,7 @@ RUN \
         *) \
 	    exit -1 \
 	    ;; \
+    esac
 
 RUN \
     bash miniforge3.sh -b -p /opt/miniforge
