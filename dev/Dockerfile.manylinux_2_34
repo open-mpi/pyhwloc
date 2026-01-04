@@ -8,11 +8,11 @@
 #   docker build . -f ./dev/Dockerfile.manylinux_2_34 -t pyhwloc-manylinux_2_34:latest
 #
 # Build the wheel:
-#   docker run --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws pyhwloc-manylinux_2_34:latest -- python -m pip wheel -v . --config-settings=fetch-hwloc=True --wheel-dir dist/
+#   docker run --user 1000:1000 --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws pyhwloc-manylinux_2_34:latest -- python -m pip wheel -v . --config-settings=fetch-hwloc=True --wheel-dir dist/
 #
 # Audit the wheel:
 #   WHEEL_TAG=manylinux_2_34_x86_64
-#   docker run --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws pyhwloc-manylinux_2_34:latest -- auditwheel repair --only-plat --plat ${WHEEL_TAG} ./dist/*.whl
+#   docker run --user 1000:1000 --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws pyhwloc-manylinux_2_34:latest -- auditwheel repair --exclude "libnvidia-ml*" --exclude "libcuda.so*" --only-plat --plat ${WHEEL_TAG} ./dist/*.whl
 
 
 FROM nvcr.io/nvidia/cuda:13.0.1-devel-rockylinux9
