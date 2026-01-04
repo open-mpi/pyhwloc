@@ -1,4 +1,4 @@
-# Copyright (c) 2025, NVIDIA CORPORATION.
+# Copyright (c) 2025-2026, NVIDIA CORPORATION.
 # SPDX-License-Identifier: BSD-3-Clause
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import platform
 import pytest
 
 from pyhwloc.bitmap import Bitmap
-from pyhwloc.hwloc.lib import normpath
+from pyhwloc.hwloc.lib import _IS_V3, normpath
 from pyhwloc.hwobject import Bridge, ObjType, OsDevice, PciDevice
 from pyhwloc.topology import (
     AllowFlags,
@@ -29,7 +29,8 @@ def test_context_manager_current_system() -> None:
         assert isinstance(topo.depth, int)
         assert topo.depth > 0
         assert topo.is_this_system()
-        assert "hwlocVersion" in topo.info
+        if _IS_V3:
+            assert "hwlocVersion" in topo.info
 
     # After context manager exits, topology should be destroyed
     assert not topo.is_loaded

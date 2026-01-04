@@ -1,4 +1,4 @@
-# Copyright (c) 2025, NVIDIA CORPORATION.
+# Copyright (c) 2025-2026, NVIDIA CORPORATION.
 # SPDX-License-Identifier: BSD-3-Clause
 """
 The Object Interface
@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, Iterator, Protocol, TypeAlias, cast
 
 from .bitmap import Bitmap
 from .hwloc import core as _core
+from .hwloc.lib import _IS_V3
 from .utils import PciId, _Flags, _get_info, _or_flags, _reuse_doc, _TopoRefMixin
 
 if TYPE_CHECKING:
@@ -594,6 +595,26 @@ class NumaNode(Object):
     def local_memory(self) -> int:
         """Local memory (in bytes)."""
         return self.attr.local_memory
+
+    @dataclass
+    class PageType:
+        size: int
+        count: int
+
+    @property
+    def page_types(self) -> list[PageType]:
+        """List of local memory page types."""
+        if _IS_V3:
+            raise TypeError("page types has been removed in v3.")
+        prop = []
+        for i in range(self.attr.page_types_len):
+            prop.append(
+                self.PageType(
+                    size=self.attr.page_types[i].size,
+                    count=self.attr.page_types[i].count,
+                )
+            )
+        return prop
 
 
 class Cache(Object):

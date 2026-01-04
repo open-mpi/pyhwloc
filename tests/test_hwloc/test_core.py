@@ -90,7 +90,7 @@ from pyhwloc.hwloc.core import (
     type_sscanf,
     type_sscanf_as_depth,
 )
-from pyhwloc.hwloc.lib import HwLocError
+from pyhwloc.hwloc.lib import _IS_V3, HwLocError
 
 
 def test_get_api_version() -> None:
@@ -168,6 +168,11 @@ def test_topology_get_infos() -> None:
 
     topology_set_io_types_filter(topo, TypeFilter.KEEP_IMPORTANT)
     topology_load(topo)
+
+    if not _IS_V3:
+        with pytest.raises(NotImplementedError, match="Only valid"):
+            infos = topology_get_infos(topo)
+        return
 
     infos = topology_get_infos(topo)
 

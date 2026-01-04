@@ -66,30 +66,57 @@ hwloc_const_nodeset_t = const_bitmap_t
 
 # https://www.open-mpi.org/projects/hwloc/doc/v2.12.1/a00140.php
 
+if _IS_V3:
 
-@_cenumdoc("hwloc_obj_type_t")
-class ObjType(IntEnum):
-    MACHINE = 0
-    PACKAGE = 1
-    DIE = 2
-    CORE = 3
-    PU = 4
-    L1CACHE = 5
-    L2CACHE = 6
-    L3CACHE = 7
-    L4CACHE = 8
-    L5CACHE = 9
-    L1ICACHE = 10
-    L2ICACHE = 11
-    L3ICACHE = 12
-    GROUP = 13
-    NUMANODE = 14
-    MEMCACHE = 15
-    BRIDGE = 16
-    PCI_DEVICE = 17
-    OS_DEVICE = 18
-    MISC = 19
-    TYPE_MAX = 20
+    @_cenumdoc("hwloc_obj_type_t")
+    class ObjType(IntEnum):
+        MACHINE = 0
+        PACKAGE = 1
+        DIE = 2
+        CORE = 3
+        PU = 4
+        L1CACHE = 5
+        L2CACHE = 6
+        L3CACHE = 7
+        L4CACHE = 8
+        L5CACHE = 9
+        L1ICACHE = 10
+        L2ICACHE = 11
+        L3ICACHE = 12
+        GROUP = 13
+        NUMANODE = 14
+        MEMCACHE = 15
+        BRIDGE = 16
+        PCI_DEVICE = 17
+        OS_DEVICE = 18
+        MISC = 19
+        TYPE_MAX = 20
+
+else:
+
+    @_cenumdoc("hwloc_obj_type_t")
+    class ObjType(IntEnum):  # type: ignore[no-redef]
+        MACHINE = 0
+        PACKAGE = 1
+        CORE = 2
+        PU = 3
+        L1CACHE = 4
+        L2CACHE = 5
+        L3CACHE = 6
+        L4CACHE = 7
+        L5CACHE = 8
+        L1ICACHE = 9
+        L2ICACHE = 10
+        L3ICACHE = 11
+        GROUP = 12
+        NUMANODE = 13
+        BRIDGE = 14
+        PCI_DEVICE = 15
+        OS_DEVICE = 16
+        MISC = 17
+        MEMCACHE = 18
+        DIE = 19
+        TYPE_MAX = 20
 
 
 @_cenumdoc("hwloc_obj_cache_type_e")
@@ -165,11 +192,36 @@ else:
     InfosPtr = ctypes._Pointer
 
 
-@_cstructdoc("hwloc_numanode_attr_s", parent="hwloc_obj_attr_u")
-class NumanodeAttr(_PrintableStruct):
-    _fields_ = [
-        ("local_memory", hwloc_uint64_t),  # Local memory (in bytes)
-    ]
+if not _IS_V3:
+
+    @_cstructdoc("hwloc_memory_page_type_s", parent="hwloc_obj_attr_u")
+    class MemoryPageType(_PrintableStruct):
+        _fields_ = [
+            ("size", hwloc_uint64_t),  # Size of pages
+            ("count", hwloc_uint64_t),  # Number of pages of this size
+        ]
+
+
+if _IS_V3:
+
+    @_cstructdoc("hwloc_numanode_attr_s", parent="hwloc_obj_attr_u")
+    class NumanodeAttr(_PrintableStruct):
+        _fields_ = [
+            ("local_memory", hwloc_uint64_t),  # Local memory (in bytes)
+        ]
+
+else:
+
+    @_cstructdoc("hwloc_numanode_attr_s", parent="hwloc_obj_attr_u")
+    class NumanodeAttr(_PrintableStruct):  # type: ignore[no-redef]
+        _fields_ = [
+            ("local_memory", hwloc_uint64_t),  # Local memory (in bytes)
+            ("page_types_len", ctypes.c_uint),  # Size of array page_types
+            (
+                "page_types",
+                ctypes.POINTER(MemoryPageType),
+            ),  # Array of local memory page types
+        ]
 
 
 @_cstructdoc("hwloc_cache_attr_s", parent="hwloc_obj_attr_u")
@@ -349,10 +401,23 @@ Obj._fields_ = [
     ("complete_cpuset", hwloc_cpuset_t),
     ("nodeset", hwloc_nodeset_t),
     ("complete_nodeset", hwloc_nodeset_t),
-    ("infos", Infos),
-    ("userdata", ctypes.c_void_p),
-    ("gp_index", hwloc_uint64_t),
 ]
+
+if _IS_V3:
+    Obj._fields_.append(("infos", Infos))
+else:
+    Obj._fields_.extend(
+        [
+            ("infos", ctypes.POINTER(Info)),
+            ("infos_count", ctypes.c_uint),
+        ]
+    )
+Obj._fields_.extend(
+    [
+        ("userdata", ctypes.c_void_p),
+        ("gp_index", hwloc_uint64_t),
+    ]
+)
 
 
 if TYPE_CHECKING:
@@ -454,23 +519,23 @@ def get_type_depth(topology: topology_t, obj_type: ObjType) -> int:
     return _LIB.hwloc_get_type_depth(topology, obj_type)
 
 
-_LIB.hwloc_get_type_depth_with_attr.argtypes = [
-    topology_t,
-    ctypes.c_int,  # ObjType
-    ctypes.POINTER(ObjAttr),
-    ctypes.c_size_t,
-]
-_LIB.hwloc_get_type_depth_with_attr.restype = ctypes.c_int
+if _IS_V3:
+    _LIB.hwloc_get_type_depth_with_attr.argtypes = [
+        topology_t,
+        ctypes.c_int,  # ObjType
+        ctypes.POINTER(ObjAttr),
+        ctypes.c_size_t,
+    ]
+    _LIB.hwloc_get_type_depth_with_attr.restype = ctypes.c_int
 
-
-@_cfndoc
-def get_type_depth_with_attr(
-    topology: topology_t,
-    obj_type: ObjType,
-    attr: ctypes._Pointer,  # [hwloc_obj_attr_u]
-    attrsize: int,
-) -> int:
-    return _LIB.hwloc_get_type_depth_with_attr(topology, obj_type, attr, attrsize)
+    @_cfndoc
+    def get_type_depth_with_attr(
+        topology: topology_t,
+        obj_type: ObjType,
+        attr: ctypes._Pointer,  # [hwloc_obj_attr_u]
+        attrsize: int,
+    ) -> int:
+        return _LIB.hwloc_get_type_depth_with_attr(topology, obj_type, attr, attrsize)
 
 
 _LIB.hwloc_get_memory_parents_depth.argtypes = [topology_t]
@@ -761,12 +826,15 @@ def obj_set_subtype(topology: topology_t, obj: ObjPtr, subtype: str) -> None:
     _checkc(_LIB.hwloc_obj_set_subtype(topology, obj, subtype_bytes))
 
 
-_LIB.hwloc_topology_get_infos.argtypes = [topology_t]
-_LIB.hwloc_topology_get_infos.restype = ctypes.POINTER(Infos)
+if _IS_V3:
+    _LIB.hwloc_topology_get_infos.argtypes = [topology_t]
+    _LIB.hwloc_topology_get_infos.restype = ctypes.POINTER(Infos)
 
 
 @_cfndoc
 def topology_get_infos(topology: topology_t) -> InfosPtr:
+    if not _IS_V3:
+        raise NotImplementedError("Only valid in v3.")
     infos = _LIB.hwloc_topology_get_infos(topology)
     return infos
 
@@ -2618,11 +2686,22 @@ def topology_set_userdata_import_callback(
 # https://www.open-mpi.org/projects/hwloc/doc/v2.12.1/a00163.php
 
 
-@_cenumdoc("hwloc_topology_export_synthetic_flags_e")
-class ExportSyntheticFlags(IntEnum):
-    NO_EXTENDED_TYPES = 1 << 0
-    NO_ATTRS = 1 << 1
-    IGNORE_MEMORY = 1 << 2
+if _IS_V3:
+
+    @_cenumdoc("hwloc_topology_export_synthetic_flags_e")
+    class ExportSyntheticFlags(IntEnum):
+        NO_EXTENDED_TYPES = 1 << 0
+        NO_ATTRS = 1 << 1
+        IGNORE_MEMORY = 1 << 2
+
+else:
+
+    @_cenumdoc("hwloc_topology_export_synthetic_flags_e")
+    class ExportSyntheticFlags(IntEnum):  # type: ignore[no-redef]
+        NO_EXTENDED_TYPES = 1 << 0
+        NO_ATTRS = 1 << 1
+        V1 = 1 << 2
+        IGNORE_MEMORY = 1 << 3
 
 
 _LIB.hwloc_topology_export_synthetic.argtypes = [
