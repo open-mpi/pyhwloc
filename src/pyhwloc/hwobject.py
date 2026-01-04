@@ -605,7 +605,7 @@ class NumaNode(Object):
     def page_types(self) -> list[PageType]:
         """List of local memory page types."""
         if _IS_V3:
-            raise TypeError("page types has been removed in v3.")
+            raise TypeError("The `page_types` has been removed in v3.")
         prop = []
         for i in range(self.attr.page_types_len):
             prop.append(
