@@ -10,7 +10,7 @@ from typing import Any, Iterator
 
 import hatchling.build
 
-from .hook import BUILD_KEY, CUDA_KEY, FETCH_KEY, ROOT_KEY, SRC_KEY
+from .hook import BUILD_KEY, CUDA_KEY, FETCH_KEY, ROOT_KEY, SRC_KEY, V3_KEY
 
 
 @contextmanager
@@ -26,6 +26,8 @@ def build_config(config_settings: dict[str, Any] | None) -> Iterator[None]:
             os.environ[SRC_KEY] = config_settings["hwloc-src-dir"]
         if "hwloc-root-dir" in config_settings:
             os.environ[ROOT_KEY] = config_settings["hwloc-root-dir"]
+        if "hwloc-v3" in config_settings:
+            os.environ[V3_KEY] = config_settings["hwloc-v3"]
         if "with-cuda" in config_settings:
             v = config_settings["with-cuda"]
             assert v in ("True", "False")
@@ -41,6 +43,8 @@ def build_config(config_settings: dict[str, Any] | None) -> Iterator[None]:
             del os.environ[SRC_KEY]
         if ROOT_KEY in os.environ:
             del os.environ[ROOT_KEY]
+        if V3_KEY in os.environ:
+            del os.environ[V3_KEY]
         if CUDA_KEY in os.environ:
             del os.environ[CUDA_KEY]
 

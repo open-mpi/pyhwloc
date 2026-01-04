@@ -16,6 +16,7 @@ from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 from packaging.tags import platform_tags
 
 FETCH_KEY = "PYHWLOC_FETCH_HWLOC"
+V3_KEY = "PYHWLOC_HWLOC_V3"
 CUDA_KEY = "PYHWLOC_WITH_CUDA"
 BUILD_KEY = "PYHWLOC_BUILD_DIR"
 ROOT_KEY = "PYHWLOC_HWLOC_ROOT_DIR"
@@ -159,6 +160,13 @@ class CMakeBuildHook(BuildHookInterface):
         if fetch_hwloc == "True":
             cmake_args.append(f"-D{FETCH_KEY}=ON")
             print("Building with fetched hwloc from GitHub")
+
+        # Do we want to use the latest (v3)?
+        hwloc_v3 = os.environ.get(V3_KEY, None)
+        if hwloc_v3 == "True":
+            cmake_args.append(f"-D{V3_KEY}=ON")
+        elif hwloc_v3 == "False":
+            cmake_args.append(f"-D{V3_KEY}=OFF")
 
         # Existing hwloc installation root
         if os.environ.get(ROOT_KEY, None) is not None:
