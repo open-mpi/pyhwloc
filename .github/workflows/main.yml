@@ -104,7 +104,8 @@ jobs:
         rm -rf ./dist && git clean -xdf
         pip uninstall pyhwloc -y
 
-    - name: Install pyhwloc with custom hwloc
+    - name: Install pyhwloc with custom hwloc v3
+      if: matrix.hwloc == 'latest'
       shell: bash -l {0}
       run: |
         source activate base
@@ -112,6 +113,20 @@ jobs:
         echo $(pwd)
 
         pip wheel -v . --config-settings=fetch-hwloc=True --wheel-dir dist/
+        pip install dist/pyhwloc-*.whl
+        python -c "from pyhwloc import Topology"
+
+        python dev/check_plugins.py
+
+    - name: Install pyhwloc with custom hwloc v2
+      if: matrix.hwloc != 'latest'
+      shell: bash -l {0}
+      run: |
+        source activate base
+        echo "conda: ${CONDA_PREFIX}"
+        echo $(pwd)
+
+        pip wheel -v . --config-settings=fetch-hwloc=True --config-settings=hwloc-v3=False --wheel-dir dist/
         pip install dist/pyhwloc-*.whl
         python -c "from pyhwloc import Topology"
 
