@@ -11,7 +11,7 @@ import ctypes
 import errno
 import sys
 from enum import IntEnum
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
 from .bitmap import bitmap_alloc, bitmap_t, const_bitmap_t
 from .lib import (
@@ -371,7 +371,7 @@ class Obj(_PrintableStruct):
 obj_t = ctypes.POINTER(Obj)
 
 
-Obj._fields_ = [
+_obj_fields: list[tuple[str, Any]] = [
     ("type", ctypes.c_int),  # hwloc_obj_type_t
     ("subtype", ctypes.c_char_p),
     ("os_index", ctypes.c_uint),
@@ -404,20 +404,22 @@ Obj._fields_ = [
 ]
 
 if _IS_V3:
-    Obj._fields_.append(("infos", Infos))
+    _obj_fields.append(("infos", Infos))
 else:
-    Obj._fields_.extend(
+    _obj_fields.extend(
         [
             ("infos", ctypes.POINTER(Info)),
             ("infos_count", ctypes.c_uint),
         ]
     )
-Obj._fields_.extend(
+_obj_fields.extend(
     [
         ("userdata", ctypes.c_void_p),
         ("gp_index", hwloc_uint64_t),
     ]
 )
+
+Obj._fields_ = _obj_fields
 
 
 if TYPE_CHECKING:
@@ -3561,6 +3563,8 @@ def cpukinds_register(
 ) -> None:
     pinfos = ctypes.byref(infos) if infos is not None else None
     # The parameter flags must be 0 for now.
+    if not _IS_V3:
+        raise NotImplementedError("Only valid in v3.")
     _checkc(
         _LIB.hwloc_cpukinds_register(topology, cpuset, forced_efficiency, pinfos, 0)
     )

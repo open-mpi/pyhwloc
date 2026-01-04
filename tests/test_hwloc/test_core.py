@@ -528,6 +528,7 @@ def test_cpukinds_get_info() -> None:
     assert nr_kinds >= 0
 
 
+@pytest.mark.skipif(condition=not _IS_V3, reason="Not implemented for V2.")
 def test_cpukinds_register_and_get_functions() -> None:
     topo = Topology()
 
