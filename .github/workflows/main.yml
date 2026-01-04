@@ -118,7 +118,7 @@ jobs:
         python dev/check_plugins.py
 
     - name: Upload binary wheel
-      if: matrix.hwloc == "latest"
+      if: matrix.hwloc == latest
       uses: actions/upload-artifact@v6.0.0
       with:
         name: Linux-Fat-wheel
@@ -141,7 +141,7 @@ jobs:
         pytest -s -v -rxXs --durations=0 ./tests
 
     - name: Build document
-      if: matrix.hwloc == "latest"
+      if: matrix.hwloc == latest
       shell: bash -l {0}
       run: |
         source activate base
