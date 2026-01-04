@@ -34,7 +34,7 @@ jobs:
         isort --profile=black --check .
         mypy .
 
-  Linux-test-V3:
+  Linux-test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
