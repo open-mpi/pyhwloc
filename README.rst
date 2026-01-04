@@ -22,6 +22,6 @@ Quick Start Example
         print(f"System has {n_cores} CPU cores")
         print(f"System has {n_numa} NUMA nodes")
 
-        # Get current CPU binding
+        # Get the current CPU binding
         cpuset = topo.get_cpubind()
         print(f"Current CPU binding: {cpuset}")
