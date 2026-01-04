@@ -8,6 +8,7 @@ project(pyhwloc LANGUAGES C VERSION 3.0.0)
 list(APPEND CMAKE_MODULE_PATH "${pyhwloc_SOURCE_DIR}/cmake/")
 
 option(PYHWLOC_FETCH_HWLOC "Fetch hwloc from GitHub instead of using system version" OFF)
+option(PYHWLOC_HWLOC_V3 "Use v3 version of hwloc" ON)
 option(PYHWLOC_WITH_CUDA "Add CUDA-related components" ON)
 
 set(PYHWLOC_BUILD_HWLOC_CMAKE OFF)
@@ -24,7 +25,11 @@ if(PYHWLOC_FETCH_HWLOC)
   set(PYHWLOC_CONFIG_HWLOC OFF CACHE BOOL "")
 
   include(FetchContent)
-  file(READ ${pyhwloc_SOURCE_DIR}/dev/hwloc_version HWLOC_VERSION)
+  if (PYHWLOC_HWLOC_V3)
+    file(READ ${pyhwloc_SOURCE_DIR}/dev/hwloc_version HWLOC_VERSION)
+  else()
+    file(READ ${pyhwloc_SOURCE_DIR}/dev/hwloc_version_v2 HWLOC_VERSION)
+  endif()
   message(STATUS "HWLOC_VERSION: ${HWLOC_VERSION}")
   FetchContent_Declare(
     hwloc

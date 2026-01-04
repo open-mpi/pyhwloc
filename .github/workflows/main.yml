@@ -40,8 +40,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
+        hwloc: [latest, v2.12.2]
     container:
-      image: ghcr.io/open-mpi/pyhwloc:latest
+      image: ghcr.io/open-mpi/pyhwloc:${{ matrix.hwloc }}
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -103,7 +104,8 @@ jobs:
         rm -rf ./dist && git clean -xdf
         pip uninstall pyhwloc -y
 
-    - name: Install pyhwloc with custom hwloc
+    - name: Install pyhwloc with custom hwloc v3
+      if: matrix.hwloc == 'latest'
       shell: bash -l {0}
       run: |
         source activate base
@@ -116,7 +118,22 @@ jobs:
 
         python dev/check_plugins.py
 
+    - name: Install pyhwloc with custom hwloc v2
+      if: matrix.hwloc != 'latest'
+      shell: bash -l {0}
+      run: |
+        source activate base
+        echo "conda: ${CONDA_PREFIX}"
+        echo $(pwd)
+
+        pip wheel -v . --config-settings=fetch-hwloc=True --config-settings=hwloc-v3=False --wheel-dir dist/
+        pip install dist/pyhwloc-*.whl
+        python -c "from pyhwloc import Topology"
+
+        python dev/check_plugins.py
+
     - name: Upload binary wheel
+      if: matrix.hwloc == 'latest'
       uses: actions/upload-artifact@v6.0.0
       with:
         name: Linux-Fat-wheel
@@ -139,6 +156,7 @@ jobs:
         pytest -s -v -rxXs --durations=0 ./tests
 
     - name: Build document
+      if: matrix.hwloc == 'latest'
       shell: bash -l {0}
       run: |
         source activate base

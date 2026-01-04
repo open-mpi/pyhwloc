@@ -102,6 +102,7 @@ A complete list of options available for the ``--config-settings=``:
 - ``hwloc-root-dir=/path/to/hwloc`` to specify the path of an existing binary hwloc
   installation.
 - ``fetch-hwloc=True`` to build the fat wheel.
+- ``hwloc-v3=False`` to use v2 instead.
 - ``with-cuda=False`` to build pyhwloc without CUDA plugins. This is used for building
   document in a minimum environment and is not tested for other purposes.
 
