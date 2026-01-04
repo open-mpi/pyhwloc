@@ -163,6 +163,7 @@ class CMakeBuildHook(BuildHookInterface):
 
         # Do we want to use the latest (v3)?
         hwloc_v3 = os.environ.get(V3_KEY, None)
+        assert hwloc_v3 in (None, "True", "False")
         if hwloc_v3 == "True":
             cmake_args.append(f"-D{V3_KEY}=ON")
         elif hwloc_v3 == "False":
