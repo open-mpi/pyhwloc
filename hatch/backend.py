@@ -27,7 +27,9 @@ def build_config(config_settings: dict[str, Any] | None) -> Iterator[None]:
         if "hwloc-root-dir" in config_settings:
             os.environ[ROOT_KEY] = config_settings["hwloc-root-dir"]
         if "hwloc-v3" in config_settings:
-            os.environ[V3_KEY] = config_settings["hwloc-v3"]
+            v = config_settings["hwloc-v3"]
+            assert v in ("True", "False")
+            os.environ[V3_KEY] = v
         if "with-cuda" in config_settings:
             v = config_settings["with-cuda"]
             assert v in ("True", "False")
