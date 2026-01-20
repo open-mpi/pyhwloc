@@ -8,6 +8,7 @@ dependencies:
 - cmake
 - cuda-cudart-dev
 - cuda-nvml-dev
+- cuda-nvcc
 - cuda-python
 - cuda-version=13.0
 - nvidia-ml-py
