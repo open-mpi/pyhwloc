@@ -30,5 +30,5 @@ Quick Start Example
 Supported Platforms
 ===================
 
-- Linux Distributions, tested with latest Ubuntu LTS.
+- Linux distributions, tested with latest Ubuntu LTS.
 - Latest Windows.
