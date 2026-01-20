@@ -27,8 +27,16 @@ Quick Start Example
         print(f"Current CPU binding: {cpuset}")
 
 
-Supported Platforms
-===================
+Install
+=======
+
+.. code-block:: sh
+
+   pip install pyhwloc
+
+Supported platforms:
 
 - Linux distributions, tested with latest Ubuntu LTS.
 - Latest Windows.
+
+The binaries on PyPI have optional support for CUDA 13 plugins.
