@@ -20,8 +20,6 @@ jobs:
         os: [ubuntu-latest]
     steps:
     - uses: actions/checkout@v6.0.1
-      with:
-        submodules: false
     - uses: dmlc/xgboost-devops/actions/miniforge-setup@main
       with:
         environment-name: pyhwloc_lint
@@ -62,9 +60,6 @@ jobs:
         cd /ws
 
     - uses: actions/checkout@v6.0.1
-      with:
-        submodules: false
-
     - name: Install pyhwloc editable
       shell: bash -l {0}
       run: |
@@ -174,8 +169,6 @@ jobs:
         os: [windows-latest]
     steps:
     - uses: actions/checkout@v6.0.1
-      with:
-        submodules: false
     - uses: dmlc/xgboost-devops/actions/miniforge-setup@main
       with:
         environment-name: pyhwloc_dev
