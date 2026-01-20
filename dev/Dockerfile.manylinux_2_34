@@ -11,8 +11,12 @@
 #   docker run --user 1000:1000 --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws pyhwloc-manylinux_2_34:latest -- python -m pip wheel -v . --config-settings=fetch-hwloc=True --wheel-dir dist/
 #
 # Audit the wheel:
+#   WHEEL_TAG=manylinux_2_34_aarch64
 #   WHEEL_TAG=manylinux_2_34_x86_64
 #   docker run --user 1000:1000 --rm --gpus=all --workdir=/ws --mount type=bind,src=.,dst=/ws pyhwloc-manylinux_2_34:latest -- auditwheel repair --exclude "libnvidia-ml*" --exclude "libcuda.so*" --only-plat --plat ${WHEEL_TAG} ./dist/*.whl
+#
+# Check the wheel (w/o docker):
+#   twine check ./dist/*.whl
 
 
 FROM nvcr.io/nvidia/cuda:13.0.1-devel-rockylinux9
