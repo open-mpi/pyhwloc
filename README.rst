@@ -25,3 +25,10 @@ Quick Start Example
         # Get the current CPU binding
         cpuset = topo.get_cpubind()
         print(f"Current CPU binding: {cpuset}")
+
+
+Supported Platforms
+===================
+
+- Linux Distributions, tested with latest Ubuntu LTS.
+- Latest Windows.
