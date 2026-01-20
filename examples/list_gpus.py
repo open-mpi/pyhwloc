@@ -5,6 +5,8 @@ Simple script for listing GPU devices
 =====================================
 """
 
+import sys
+
 import cuda.bindings.driver as cuda
 import cuda.bindings.runtime as cudart
 
@@ -86,7 +88,10 @@ if __name__ == "__main__":
     list_with_osdev()
     print("\nList by CUDA runtime\n")
     list_with_cudart()
-    print("\nList by CUDA driver\n")
-    list_with_cuda()
-    print("\nList by NVML\n")
-    list_with_nvml()
+
+    is_windows = sys.platform == "win32"
+    if not is_windows:
+        print("\nList by CUDA driver\n")
+        list_with_cuda()
+        print("\nList by NVML\n")
+        list_with_nvml()
