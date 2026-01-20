@@ -1,0 +1,9 @@
+name: pyhwloc_lint
+channels:
+- conda-forge
+dependencies:
+# -- python local
+- python==3.12
+- black
+- isort
+- mypy
