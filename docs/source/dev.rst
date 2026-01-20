@@ -62,7 +62,8 @@ To build an image for V3:
 
 .. code-block:: sh
 
-    docker build --progress=plain . -f ./Dockerfile.cpu -t ghcr.io/open-mpi/pyhwloc:latest
+    docker build --progress=plain . -f ./Dockerfile.cpu --platform linux/amd64 --build-arg  HWLOC_MAJOR=3 -t ghcr.io/open-mpi/pyhwloc:latest
+    docker build --progress=plain . -f ./Dockerfile.cpu --platform linux/arm64 --build-arg  HWLOC_MAJOR=3 -t ghcr.io/open-mpi/pyhwloc:latest
 
 - Push the image and find the package in https://github.com/orgs/open-mpi/packages
 

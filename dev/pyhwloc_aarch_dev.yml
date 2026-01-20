@@ -21,7 +21,7 @@ dependencies:
 - make
 - ninja
 
-- sysroot_linux-64==2.28
+- sysroot_linux-aarch64==2.28
 
 # -- python local
 - python==3.12

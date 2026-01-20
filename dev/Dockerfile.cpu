@@ -1,6 +1,7 @@
 # Stage 1: Builder stage with doxygen and build dependencies
 FROM condaforge/miniforge3:25.3.1-0 AS builder
 ARG HWLOC_MAJOR
+ARG TARGETARCH
 
 RUN set -x \
     # basic dependencies
@@ -10,7 +11,14 @@ RUN set -x \
 
 RUN mkdir ws
 
-COPY pyhwloc_ext_dev.yml ws/pyhwloc_dev.yml
+COPY pyhwloc_ext_dev.yml pyhwloc_ext_aarch_dev.yml ws/
+
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+        mv ws/pyhwloc_ext_aarch_dev.yml ws/pyhwloc_dev.yml; \
+    else \
+        mv ws/pyhwloc_ext_dev.yml ws/pyhwloc_dev.yml; \
+    fi && \
+    rm -f ws/pyhwloc_ext_*.yml
 
 RUN mamba env update -n base -f ws/pyhwloc_dev.yml -v && mamba clean --all --yes
 
@@ -46,6 +54,7 @@ RUN \
 
 # Stage 2: Final runtime stage without doxygen and its build dependencies
 FROM condaforge/miniforge3:25.3.1-0
+ARG TARGETARCH
 
 RUN set -x \
     apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/3bf863cc.pub && \
@@ -54,7 +63,13 @@ RUN set -x \
 
 RUN mkdir ws
 
-COPY pyhwloc_dev.yml ws/pyhwloc_dev.yml
+COPY pyhwloc_dev.yml pyhwloc_aarch_dev.yml ws/
+
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+        mv ws/pyhwloc_aarch_dev.yml ws/pyhwloc_dev.yml; \
+    else \
+        rm ws/pyhwloc_aarch_dev.yml; \
+    fi
 
 RUN mamba env update -n base -f ws/pyhwloc_dev.yml -v && mamba clean --all --yes
 

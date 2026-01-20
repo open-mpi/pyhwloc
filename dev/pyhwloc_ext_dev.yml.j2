@@ -20,9 +20,11 @@ dependencies:
 - nvidia-ml-py
 - make
 - ninja
-
+{% if arch == "aarch64" %}
+- sysroot_linux-aarch64==2.28
+{% else %}
 - sysroot_linux-64==2.28
-
+{% endif %}
 # -- python local
 - python==3.12
 - hatchling
@@ -35,3 +37,11 @@ dependencies:
 - sphinx
 - myst-parser
 - sphinx-gallery
+# -- doxygen
+- libclang=21.*
+- clangdev
+- libllvm21
+- llvmdev
+- flex
+- bison
+- libxml2

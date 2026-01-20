@@ -20,7 +20,9 @@ dependencies:
 - nvidia-ml-py
 - make
 - ninja
+
 - sysroot_linux-64==2.28
+
 # -- python local
 - python==3.12
 - hatchling
