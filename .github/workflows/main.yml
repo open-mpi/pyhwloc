@@ -27,6 +27,7 @@ jobs:
         environment-name: pyhwloc_lint
         environment-file: dev/pyhwloc_lint.yml
     - name: Run lint
+      shell: bash -l {0}
       run: |
         black --check .
         isort --profile=black --check .
