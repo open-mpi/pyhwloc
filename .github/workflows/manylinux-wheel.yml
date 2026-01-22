@@ -26,7 +26,7 @@ jobs:
           - os: ubuntu-24.04
             arch: amd64
             wheel_tag: manylinux_2_34_x86_64
-          - os: ubuntu-24.04-arm64
+          - os: ubuntu-24.04-arm
             arch: arm64
             wheel_tag: manylinux_2_34_aarch64
     steps:
