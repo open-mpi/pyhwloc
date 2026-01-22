@@ -18,15 +18,13 @@ def main() -> int:
         print(f"Topology depth: {topo.depth}")
 
         # Print basic system information
-        print(
-            f"""
+        print(f"""
 === System Overview ===
 CPUs: {topo.n_cpus()}
 Cores: {topo.n_cores()}
 NUMA nodes: {topo.n_numa_nodes()}
 Packages: {topo.n_packages()}
-"""
-        )
+""")
 
         # Iterate through all objects by depth
         print("=== Objects by Depth ===")
