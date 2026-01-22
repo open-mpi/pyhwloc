@@ -31,7 +31,7 @@ RUN \
     dnf config-manager --set-enabled devel && \
     dnf install cmake python3-pip git ninja-build wget -y && \
     dnf install autoconf automake libtool libpciaccess-devel -y && \
-    dnf install cuda-nvcc-${CUDA_VERSION} cuda-cudart-devel-${CUDA_VERSION} cuda-nvml-devel-${CUDA_VERSION} cuda-compat-${CUDA_VERSION} -y && \
+    dnf install cuda-nvcc-${CUDA_VERSION} cuda-cudart-devel-${CUDA_VERSION} cuda-nvml-devel-${CUDA_VERSION} cuda-compat-${CUDA_VERSION} cuda-driver-devel-${CUDA_VERSION} -y && \
     rm -rf /var/cache/dnf
 
 RUN \
