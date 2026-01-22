@@ -32,6 +32,6 @@ dependencies:
 - pytest-cov
 # -- document
 - breathe
-- sphinx
+- sphinx==8.2.3
 - myst-parser
 - sphinx-gallery

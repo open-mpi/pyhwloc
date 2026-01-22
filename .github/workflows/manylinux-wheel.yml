@@ -1,0 +1,46 @@
+name: Build manylinux_2_34 wheels
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build-wheels:
+    runs-on: ${{ matrix.os }}
+    container:
+      image: ghcr.io/open-mpi/pyhwloc-manylinux_2_34:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            arch: amd64
+            wheel_tag: manylinux_2_34_x86_64
+          - os: ubuntu-24.04-arm64
+            arch: arm64
+            wheel_tag: manylinux_2_34_aarch64
+    steps:
+    - uses: actions/checkout@v6.0.1
+    - name: Build wheel
+      run: python -m pip wheel -v . --config-settings=fetch-hwloc=True --wheel-dir dist/
+    - name: Audit wheel
+      run: auditwheel repair --exclude "libnvidia-ml*" --exclude "libcuda.so*" --only-plat --plat ${{ matrix.wheel_tag }} ./dist/*.whl
+    - name: Twine check
+      run: python -m twine check ./wheelhouse/*.whl
+    - name: Upload wheels
+      uses: actions/upload-artifact@v6
+      with:
+        name: manylinux_2_34-${{ matrix.arch }}-wheel
+        path: wheelhouse/*.whl
+        if-no-files-found: error
+        retention-days: 7
