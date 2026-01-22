@@ -15,7 +15,7 @@ jobs:
   build-wheels:
     runs-on: ${{ matrix.os }}
     container:
-      image: ghcr.io/open-mpi/pyhwloc-manylinux_2_34:latest
+      image: ${{ matrix.image_repo }}:latest
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -25,9 +25,11 @@ jobs:
         include:
           - os: ubuntu-24.04
             arch: amd64
+            image_repo: ghcr.io/open-mpi/pyhwloc-manylinux_2_34-x86_64
             wheel_tag: manylinux_2_34_x86_64
           - os: ubuntu-24.04-arm64
             arch: arm64
+            image_repo: ghcr.io/open-mpi/pyhwloc-manylinux_2_34-aarch64
             wheel_tag: manylinux_2_34_aarch64
     steps:
     - uses: actions/checkout@v6.0.1
