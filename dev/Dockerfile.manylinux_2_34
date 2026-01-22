@@ -51,4 +51,4 @@ RUN \
 
 ENV PATH="$PATH:/opt/miniforge/bin"
 
-RUN mamba install hatchling auditwheel patchelf -y
+RUN mamba install hatchling auditwheel patchelf twine -y
