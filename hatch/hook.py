@@ -21,6 +21,7 @@ CUDA_KEY = "PYHWLOC_WITH_CUDA"
 BUILD_KEY = "PYHWLOC_BUILD_DIR"
 ROOT_KEY = "PYHWLOC_HWLOC_ROOT_DIR"
 SRC_KEY = "PYHWLOC_HWLOC_SRC_DIR"
+DEBUG_KEY = "PYHWLOC_DEBUG"
 
 
 def get_vs_generator() -> str:
@@ -189,17 +190,28 @@ class CMakeBuildHook(BuildHookInterface):
             cmake_args.append(f"-DFETCHCONTENT_SOURCE_DIR_HWLOC={src_dir}")
             assert fetch_hwloc == "True"
 
+        # Debug build
+        debug_build = os.environ.get(DEBUG_KEY, None)
+        assert debug_build in (None, "True", "False")
+        build_type = "Debug" if debug_build == "True" else "Release"
+
         # Build path
         if os.environ.get(BUILD_KEY, None) is not None:
             build_dir = os.environ[BUILD_KEY]
             run_cmake_build(
-                source_dir=self.root, build_dir=build_dir, cmake_args=cmake_args
+                source_dir=self.root,
+                build_dir=build_dir,
+                build_type=build_type,
+                cmake_args=cmake_args,
             )
         else:
             with tempfile.TemporaryDirectory() as build_dir:
                 print("build-dir:", build_dir)
                 run_cmake_build(
-                    source_dir=self.root, build_dir=build_dir, cmake_args=cmake_args
+                    source_dir=self.root,
+                    build_dir=build_dir,
+                    build_type=build_type,
+                    cmake_args=cmake_args,
                 )
 
         # Remove all the unneeded files. We don't use the embedded mode as it doesn't

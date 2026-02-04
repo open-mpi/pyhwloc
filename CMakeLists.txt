@@ -5,6 +5,11 @@ cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 project(pyhwloc LANGUAGES C VERSION 2.0.0)
 
+# Set default build type to Release if not specified (used by single-config generators; ignored by multi-config generators)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${pyhwloc_SOURCE_DIR}/cmake/")
 
 option(PYHWLOC_FETCH_HWLOC "Fetch hwloc from GitHub instead of using system version" OFF)
@@ -48,6 +53,7 @@ if(PYHWLOC_FETCH_HWLOC)
         -B ${hwloc_BINARY_DIR}
         -G ${CMAKE_GENERATOR}
         -DCMAKE_INSTALL_PREFIX=${PYHWLOC_OUTPUT_DIR}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DBUILD_SHARED_LIBS=ON
         -DHWLOC_WITH_CUDA=${PYHWLOC_WITH_CUDA}
         -DHWLOC_ENABLE_PLUGINS=ON
@@ -57,9 +63,17 @@ if(PYHWLOC_FETCH_HWLOC)
       execute_process(
         COMMAND ${hwloc_SOURCE_DIR}/autogen.sh WORKING_DIRECTORY ${hwloc_SOURCE_DIR}
       )
+      # Set compiler flags based on build type
+      if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(HWLOC_CFLAGS "CFLAGS=-g -O0")
+        set(HWLOC_CXXFLAGS "CXXFLAGS=-g -O0")
+      else()
+        set(HWLOC_CFLAGS "")
+        set(HWLOC_CXXFLAGS "")
+      endif()
       execute_process(
         # Use avoid version to NOT create versioned sonames like: libhwloc.so.0.0.0
-        COMMAND ${hwloc_SOURCE_DIR}/configure --enable-plugins --prefix=${PYHWLOC_OUTPUT_DIR} HWLOC_LDFLAGS=-avoid-version
+        COMMAND ${hwloc_SOURCE_DIR}/configure --enable-plugins --prefix=${PYHWLOC_OUTPUT_DIR} HWLOC_LDFLAGS=-avoid-version ${HWLOC_CFLAGS} ${HWLOC_CXXFLAGS}
         WORKING_DIRECTORY ${hwloc_BINARY_DIR}
       )
     endif()
@@ -73,7 +87,7 @@ if(PYHWLOC_FETCH_HWLOC)
   if(PYHWLOC_BUILD_HWLOC_CMAKE)
     add_custom_command(
       OUTPUT ${PYHWLOC_OUTPUT_DIR}/bin/hwloc.dll
-      COMMAND cmake --build ${hwloc_BINARY_DIR} --config=Release --parallel=${nproc} --target=install
+      COMMAND cmake --build ${hwloc_BINARY_DIR} --config=${CMAKE_BUILD_TYPE} --parallel=${nproc} --target=install
       WORKING_DIRECTORY ${hwloc_BINARY_DIR}
     )
     add_custom_target(install_hwloc DEPENDS ${PYHWLOC_OUTPUT_DIR}/bin/hwloc.dll)

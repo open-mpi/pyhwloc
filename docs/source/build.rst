@@ -105,6 +105,8 @@ A complete list of options available for the ``--config-settings=``:
 - ``hwloc-v3=False`` to use v2 instead.
 - ``with-cuda=False`` to build pyhwloc without CUDA plugins. This is used for building
   document in a minimum environment and is not tested for other purposes.
+- ``debug=True`` to build with debug symbols and without optimizations
+  (``CMAKE_BUILD_TYPE=Debug``). This is useful for debugging issues in pyhwloc or hwloc.
 
 The binary wheel uses plugins by default. Due to the plugins support, all symbols from
 hwloc are loaded into the linker's public name space using
