@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 project(pyhwloc LANGUAGES C VERSION 2.0.0)
 
-# Set default build type to Release if not specified (needed for multi-config generators)
+# Set default build type to Release if not specified (used by single-config generators; ignored by multi-config generators)
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
