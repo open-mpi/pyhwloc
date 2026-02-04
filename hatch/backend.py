@@ -10,7 +10,7 @@ from typing import Any, Iterator
 
 import hatchling.build
 
-from .hook import BUILD_KEY, CUDA_KEY, FETCH_KEY, ROOT_KEY, SRC_KEY, V3_KEY
+from .hook import BUILD_KEY, CUDA_KEY, DEBUG_KEY, FETCH_KEY, ROOT_KEY, SRC_KEY, V3_KEY
 
 
 @contextmanager
@@ -34,6 +34,10 @@ def build_config(config_settings: dict[str, Any] | None) -> Iterator[None]:
             v = config_settings["with-cuda"]
             assert v in ("True", "False")
             os.environ[CUDA_KEY] = v
+        if "debug" in config_settings:
+            v = config_settings["debug"]
+            assert v in ("True", "False")
+            os.environ[DEBUG_KEY] = v
     try:
         yield
     finally:
@@ -49,6 +53,8 @@ def build_config(config_settings: dict[str, Any] | None) -> Iterator[None]:
             del os.environ[V3_KEY]
         if CUDA_KEY in os.environ:
             del os.environ[CUDA_KEY]
+        if DEBUG_KEY in os.environ:
+            del os.environ[DEBUG_KEY]
 
 
 def build_wheel(
