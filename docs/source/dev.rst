@@ -76,4 +76,4 @@ To build the manylinux image:
 
 .. code-block:: sh
 
-    docker build --progress=plain . -f ./dev/Dockerfile.manylinux_2_34 -t ghcr.io/open-mpi/pyhwloc-manylinux_2_34:latest
+    docker build --progress=plain ./dev -f ./Dockerfile.manylinux_2_34 -t ghcr.io/open-mpi/pyhwloc-manylinux_2_34:latest
