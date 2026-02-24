@@ -8,11 +8,6 @@ Symbol Conflicts
 The hwloc is loaded into the public linker name space to support hwloc plugins. This might
 have unintended consequences.
 
-Update hwloc
-============
-
-Update the commit hash in ``dev/hwloc_version``.
-
 Design Decisions
 ================
 
@@ -46,29 +41,37 @@ GitHub CI
 PyHwloc's GitHub action tests use container images cached in ``ghcr.io``. Please refer to
 the `GitHub document <https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry>`__ for an in-depth explanation of how it works.
 
-To create the initial GitHub package for PyHwloc:
+There are two Docker images used in CI:
 
-- Create a personal access token (classic) in the GitHub `developer settings <https://github.com/settings/tokens>`__, with write access (`write:packages`) to the GitHub package.
-- Log in with docker.
-- Build the container image as described in the building from source document, use the tag ``ghcr.io/open-mpi/pyhwloc:latest``.
+1. **Test image** (``ghcr.io/open-mpi/pyhwloc``): Built from ``dev/Dockerfile.cpu``, used for running tests and building documentation.
+2. **Manylinux image** (``ghcr.io/open-mpi/pyhwloc-manylinux_2_34``): Built from ``dev/Dockerfile.manylinux_2_34``, used for building portable PyPI wheels.
 
-To build an image for V2:
+Update hwloc
+------------
+
+When bumping hwloc version, one needs to:
+
+- Update the ``hwloc_version(_v2)`` files.
+- Update GHA image tags.
+- Build and push new test images using GHA.
+
+Building Images Locally
+-----------------------
+
+To build the test image for hwloc V2:
 
 .. code-block:: sh
 
-    docker build --progress=plain . -f ./Dockerfile.cpu --build-arg HWLOC_MAJOR=2 -t ghcr.io/open-mpi/pyhwloc:v2.12.2
+    docker build --progress=plain ./dev -f ./dev/Dockerfile.cpu --build-arg HWLOC_MAJOR=2 -t ghcr.io/open-mpi/pyhwloc:v2.13.0
 
-To build an image for V3:
+To build the test image for hwloc V3:
 
 .. code-block:: sh
 
-    docker build --progress=plain . -f ./Dockerfile.cpu --platform linux/amd64 --build-arg  HWLOC_MAJOR=3 -t ghcr.io/open-mpi/pyhwloc:latest
-    docker build --progress=plain . -f ./Dockerfile.cpu --platform linux/arm64 --build-arg  HWLOC_MAJOR=3 -t ghcr.io/open-mpi/pyhwloc:latest
+    docker build --progress=plain ./dev -f ./dev/Dockerfile.cpu --build-arg HWLOC_MAJOR=3 -t ghcr.io/open-mpi/pyhwloc:latest
 
-- Push the image and find the package in https://github.com/orgs/open-mpi/packages
+To build the manylinux image:
 
-Currently, the image is private. To use the image for GitHub action:
+.. code-block:: sh
 
-- Create a read-only PAT (classic, `read:packages`).
-- Store it as project secret in the project's settings tab: `Settings -> Secrets and Variables -> Actions`.
-- Refer to the name of the secret in GitHub action container configurations.
+    docker build --progress=plain ./dev -f ./Dockerfile.manylinux_2_34 -t ghcr.io/open-mpi/pyhwloc-manylinux_2_34:latest
