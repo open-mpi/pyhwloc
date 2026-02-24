@@ -51,6 +51,12 @@ There are two Docker images used in CI:
 1. **Test image** (``ghcr.io/open-mpi/pyhwloc``): Built from ``dev/Dockerfile.cpu``, used for running tests and building documentation.
 2. **Manylinux image** (``ghcr.io/open-mpi/pyhwloc-manylinux_2_34``): Built from ``dev/Dockerfile.manylinux_2_34``, used for building portable PyPI wheels.
 
+When bumping hwloc version, one needs to:
+
+- Update the ``hwloc_version(_v2)`` files.
+- Update GHA image tags.
+- Build and push new test images using GHA.
+
 Building Images Locally
 -----------------------
 

@@ -4,6 +4,7 @@ Python Interface for the Portable Hardware Locality (hwloc) Library
 
 - `Documentation <https://pyhwloc.readthedocs.io/>`__
 - `Official site <https://www.open-mpi.org/projects/hwloc/>`__ of the hwloc library.
+- `GitHub repository <https://github.com/open-mpi/hwloc>`__ of the hwloc library.
 
 
 Quick Start Example
