@@ -42,7 +42,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        hwloc: [latest, v2.12.2]
+        hwloc: [latest, v2.13.0]
     container:
       image: ghcr.io/open-mpi/pyhwloc:${{ matrix.hwloc }}
       credentials:

@@ -21,7 +21,7 @@ jobs:
           - hwloc_major: 3
             tag: latest
           - hwloc_major: 2
-            tag: v2.13
+            tag: v2.13.0
     steps:
     - uses: actions/checkout@v6.0.2
     - uses: docker/setup-qemu-action@v3.7.0
