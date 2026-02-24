@@ -1,4 +1,4 @@
-name: Build manylinux_2_34 image
+name: Build test image
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -14,6 +14,14 @@ permissions:
 jobs:
   build-image:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - hwloc_major: 3
+            tag: latest
+          - hwloc_major: 2
+            tag: v2.12.2
     steps:
     - uses: actions/checkout@v6.0.2
     - uses: docker/setup-qemu-action@v3.7.0
@@ -26,8 +34,10 @@ jobs:
     - name: Build and push image
       uses: docker/build-push-action@v6
       with:
-        context: .
-        file: dev/Dockerfile.manylinux_2_34
+        context: dev
+        file: dev/Dockerfile.cpu
         platforms: linux/amd64,linux/arm64
         push: true
-        tags: ghcr.io/open-mpi/pyhwloc-manylinux_2_34:latest
+        build-args: |
+          HWLOC_MAJOR=${{ matrix.hwloc_major }}
+        tags: ghcr.io/open-mpi/pyhwloc:${{ matrix.tag }}
