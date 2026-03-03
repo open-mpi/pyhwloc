@@ -38,7 +38,7 @@ jobs:
     - name: Twine check
       run: python -m twine check ./wheelhouse/*.whl
     - name: Upload wheels
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: manylinux_2_34-${{ matrix.arch }}-wheel
         path: wheelhouse/*.whl
@@ -51,7 +51,7 @@ jobs:
         python -m build --sdist --outdir dist
     - name: Upload sdist
       if: ${{ matrix.arch == 'amd64' }}
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: sdist
         path: dist/*.tar.gz
