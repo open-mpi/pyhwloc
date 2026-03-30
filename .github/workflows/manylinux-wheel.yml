@@ -13,9 +13,6 @@ permissions:
   packages: read
 
 jobs:
-  build-images:
-    uses: ./.github/workflows/manylinux-image.yml
-
   build-wheels:
     runs-on: ${{ matrix.os }}
     container:
