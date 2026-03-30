@@ -17,7 +17,7 @@ echo "Current: ${CURRENT_COMMIT}"
 echo "Latest:  ${LATEST_COMMIT}"
 
 git checkout -b "${BRANCH_NAME}"
-echo "${LATEST_COMMIT}" > dev/hwloc_version
+printf '%s' "${LATEST_COMMIT}" > dev/hwloc_version
 git add dev/hwloc_version
 git commit -m "Bump hwloc to ${LATEST_COMMIT}"
 

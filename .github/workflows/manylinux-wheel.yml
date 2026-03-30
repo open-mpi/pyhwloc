@@ -2,6 +2,7 @@ name: Build manylinux_2_34 wheels
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -13,7 +14,6 @@ permissions:
 
 jobs:
   build-images:
-    runs-on: ubuntu-24.04
     uses: ./.github/workflows/manylinux-image.yml
 
   build-wheels:
