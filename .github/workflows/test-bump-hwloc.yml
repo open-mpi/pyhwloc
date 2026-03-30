@@ -7,6 +7,10 @@ concurrency:
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-images:
     uses: ./.github/workflows/manylinux-image.yml
