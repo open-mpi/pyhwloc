@@ -16,4 +16,5 @@ jobs:
     uses: ./.github/workflows/manylinux-image.yml
 
   test-wheel:
+    needs: build-images
     uses: ./.github/workflows/manylinux-wheel.yml
