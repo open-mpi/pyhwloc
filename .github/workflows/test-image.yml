@@ -1,9 +1,5 @@
 name: Build test image
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 on:
   workflow_dispatch:
 
@@ -41,3 +37,7 @@ jobs:
         build-args: |
           HWLOC_MAJOR=${{ matrix.hwloc_major }}
         tags: ghcr.io/open-mpi/pyhwloc:${{ matrix.tag }}
+
+  trigger-tests:
+    needs: build-image
+    uses: ./.github/workflows/main.yml
