@@ -14,7 +14,7 @@ permissions:
 jobs:
   build-images:
     runs-on: ubuntu-24.04
-    uses: ./manylinux-image.yml
+    uses: ./.github/workflows/manylinux-image.yml
 
   build-wheels:
     runs-on: ${{ matrix.os }}
