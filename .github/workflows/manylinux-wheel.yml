@@ -12,6 +12,10 @@ permissions:
   packages: read
 
 jobs:
+  build-images:
+    runs-on: ubuntu-24.04
+    uses: ./manylinux-image.yml
+
   build-wheels:
     runs-on: ${{ matrix.os }}
     container:
