@@ -3,6 +3,11 @@ name: Build manylinux_2_34 wheels
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      ref:
+        description: Git ref to check out.
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -28,6 +33,8 @@ jobs:
             wheel_tag: manylinux_2_34_aarch64
     steps:
     - uses: actions/checkout@v6.0.2
+      with:
+        ref: ${{ inputs.ref || github.ref }}
     - name: Build wheel
       run: python -m pip wheel -v . --config-settings=fetch-hwloc=True --wheel-dir dist/
     - name: Audit wheel

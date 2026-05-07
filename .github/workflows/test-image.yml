@@ -2,6 +2,17 @@ name: Build test image
 
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref to check out.
+        required: false
+        type: string
+      images:
+        description: JSON build matrix for test images.
+        required: false
+        type: string
+        default: '[{"hwloc_major":3,"tag":"latest"},{"hwloc_major":2,"tag":"v2.13.0"}]'
 
 permissions:
   contents: read
@@ -13,13 +24,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - hwloc_major: 3
-            tag: latest
-          - hwloc_major: 2
-            tag: v2.13.0
+        include: ${{ fromJSON(inputs.images || '[{"hwloc_major":3,"tag":"latest"},{"hwloc_major":2,"tag":"v2.13.0"}]') }}
     steps:
     - uses: actions/checkout@v6.0.2
+      with:
+        ref: ${{ inputs.ref || github.ref }}
     - uses: docker/setup-qemu-action@v4.0.0
     - uses: docker/setup-buildx-action@v4.0.0
     - uses: docker/login-action@v4.1.0
@@ -41,3 +50,5 @@ jobs:
   trigger-tests:
     needs: build-image
     uses: ./.github/workflows/main.yml
+    with:
+      ref: ${{ inputs.ref || github.ref }}
