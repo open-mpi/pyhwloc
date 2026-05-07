@@ -33,6 +33,7 @@ jobs:
       uses: peter-evans/create-pull-request@v7
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        add-paths: dev/hwloc_version
         branch: bump-hwloc-master
         base: ${{ github.ref_name }}
         delete-branch: true

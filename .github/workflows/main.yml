@@ -18,7 +18,7 @@ permissions:
   packages: read  # to fetch the container image
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: pyhwloc-ci-${{ github.event.pull_request.number || inputs.ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
