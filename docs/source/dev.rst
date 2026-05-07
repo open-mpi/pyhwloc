@@ -55,6 +55,12 @@ When bumping hwloc version, one needs to:
 - Update GHA image tags.
 - Build and push new test images using GHA.
 
+For hwloc V3, this can be automated from GitHub Actions by manually running the
+``Bump hwloc and test images`` workflow. The workflow runs ``dev/bump_hwloc.sh``
+and opens a pull request only when ``dev/hwloc_version`` changes, then builds
+the updated test and wheel images, uploads wheel artifacts, and runs the normal
+CI tests against the bump branch.
+
 Building Images Locally
 -----------------------
 

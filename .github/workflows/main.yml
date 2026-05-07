@@ -7,6 +7,11 @@ on:
       - 'release_*'
   pull_request:
   workflow_call:
+    inputs:
+      ref:
+        description: Git ref to check out.
+        required: false
+        type: string
 
 permissions:
   contents: read  # to fetch code (actions/checkout)
@@ -26,6 +31,8 @@ jobs:
         os: [ubuntu-latest]
     steps:
     - uses: actions/checkout@v6.0.2
+      with:
+        ref: ${{ inputs.ref || github.ref }}
     - uses: dmlc/xgboost-devops/actions/miniforge-setup@main
       with:
         environment-name: pyhwloc_lint
@@ -66,6 +73,8 @@ jobs:
         cd /ws
 
     - uses: actions/checkout@v6.0.2
+      with:
+        ref: ${{ inputs.ref || github.ref }}
     - name: Install pyhwloc editable
       shell: bash -l {0}
       run: |
@@ -175,6 +184,8 @@ jobs:
         os: [windows-latest]
     steps:
     - uses: actions/checkout@v6.0.2
+      with:
+        ref: ${{ inputs.ref || github.ref }}
     - uses: dmlc/xgboost-devops/actions/miniforge-setup@main
       with:
         environment-name: pyhwloc_dev

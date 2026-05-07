@@ -1,20 +1,68 @@
-name: Build and test manylinux_2_34 wheels
+name: Bump hwloc and test images
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: write
+  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build-images:
-    uses: ./.github/workflows/manylinux-image.yml
+  bump-hwloc:
+    name: Bump hwloc
+    if: ${{ github.repository == 'open-mpi/pyhwloc' }}
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.bump.outputs.changed }}
+      bump_ref: ${{ steps.create-pr.outputs.pull-request-branch }}
+    steps:
+    - uses: actions/checkout@v6.0.2
+    - name: Run hwloc bump
+      id: bump
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: ./dev/bump_hwloc.sh
+    - name: Create bump pull request
+      id: create-pr
+      if: ${{ steps.bump.outputs.changed == 'true' }}
+      uses: peter-evans/create-pull-request@v7
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: bump-hwloc-master
+        base: ${{ github.ref_name }}
+        delete-branch: true
+        title: Bump hwloc to ${{ steps.bump.outputs.latest_commit }}
+        commit-message: Bump hwloc to ${{ steps.bump.outputs.latest_commit }}
+        body: |
+          Automated hwloc bump from `${{ steps.bump.outputs.current_commit }}` to `${{ steps.bump.outputs.latest_commit }}`.
 
-  test-wheel:
-    needs: build-images
+          This workflow continues by building the updated images, wheels, and test artifacts from the PR branch.
+
+  build-test-image:
+    needs: bump-hwloc
+    if: ${{ needs.bump-hwloc.outputs.changed == 'true' }}
+    uses: ./.github/workflows/test-image.yml
+    with:
+      ref: ${{ needs.bump-hwloc.outputs.bump_ref }}
+      images: '[{"hwloc_major":3,"tag":"latest"}]'
+
+  build-wheel-image:
+    needs: bump-hwloc
+    if: ${{ needs.bump-hwloc.outputs.changed == 'true' }}
+    uses: ./.github/workflows/manylinux-image.yml
+    with:
+      ref: ${{ needs.bump-hwloc.outputs.bump_ref }}
+
+  build-wheels:
+    needs:
+      - bump-hwloc
+      - build-wheel-image
+    if: ${{ needs.bump-hwloc.outputs.changed == 'true' }}
     uses: ./.github/workflows/manylinux-wheel.yml
+    with:
+      ref: ${{ needs.bump-hwloc.outputs.bump_ref }}
