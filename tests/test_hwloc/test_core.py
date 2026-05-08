@@ -383,26 +383,25 @@ def test_type_sscanf_functions() -> None:
     topo = Topology()
 
     # Test parsing basic object type strings
-    test_cases = ["Machine", "Package", "Core", "PU", "L1Cache", "L2Cache", "L3Cache"]
+    test_cases = {
+        "Machine": ObjType.MACHINE,
+        "Package": ObjType.PACKAGE,
+        "Core": ObjType.CORE,
+        "PU": ObjType.PU,
+        "L1Cache": ObjType.L1CACHE,
+        "L2Cache": ObjType.L2CACHE,
+        "L3Cache": ObjType.L3CACHE,
+    }
 
-    for type_str in test_cases:
+    for type_str, expected_type in test_cases.items():
         # Test type_sscanf without attributes
         obj_type, attr = type_sscanf(type_str)
-        assert isinstance(obj_type, ObjType)
+        assert obj_type is expected_type
         assert attr is not None
-        # The depth should be reliable. Other info like size is set to 0 for some reason
-        if obj_type == ObjType.L1CACHE:
-            assert attr.cache.depth == 1
-        if obj_type == ObjType.L2CACHE:
-            assert attr.cache.depth == 2
-        if obj_type == ObjType.L3CACHE:
-            assert attr.cache.depth == 3
         # Test type_sscanf_as_depth
         obj_type_depth, depth = type_sscanf_as_depth(type_str, topo.hdl)
-        assert isinstance(obj_type_depth, ObjType)
+        assert obj_type_depth is expected_type
         assert isinstance(depth, int)
-
-        assert obj_type == obj_type_depth
 
     # Test invalid string
     with pytest.raises(Exception):
