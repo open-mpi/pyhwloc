@@ -176,7 +176,15 @@ jobs:
         # Path is set by the build_doc_xml.sh script.
         PYHWLOC_XML_PATH=/ws/xml make html
 
+  Windows-Wheel:
+    uses: ./.github/workflows/windows-wheel.yml
+    permissions:
+      contents: read
+    with:
+      ref: ${{ inputs.ref || github.ref }}
+
   Windows-Test:
+    needs: Windows-Wheel
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -191,10 +199,15 @@ jobs:
         environment-name: pyhwloc_dev
         environment-file: dev/pyhwloc_win_dev.yml
 
-    - name: Install pyhwloc with custom hwloc
+    - name: Download Windows fat wheel
+      uses: actions/download-artifact@v7
+      with:
+        name: Windows-Fat-wheel
+        path: dist
+
+    - name: Install pyhwloc from fat wheel
       shell: pwsh
       run: |
-        pip wheel -v . --no-build-isolation --no-deps --wheel-dir dist --config-settings=fetch-hwloc=True
         pip install (Get-ChildItem .\dist\pyhwloc-*.whl).FullName
 
         python -c "from pyhwloc import Topology"
@@ -203,14 +216,6 @@ jobs:
       shell: pwsh
       run: |
         pytest -s -v .\tests
-
-    - name: Upload binary wheel
-      uses: actions/upload-artifact@v7
-      with:
-        name: Windows-Fat-wheel
-        path: dist/pyhwloc-*.whl
-        if-no-files-found: error
-        retention-days: 7
 
     - name: Cleanup
       shell: pwsh

@@ -1,0 +1,48 @@
+name: Publish to TestPyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to build and publish.
+        required: false
+        type: string
+
+jobs:
+  build-wheels:
+    uses: ./.github/workflows/manylinux-wheel.yml
+    permissions:
+      contents: read
+      packages: read
+    with:
+      ref: ${{ inputs.ref || github.ref }}
+
+  build-windows-wheels:
+    uses: ./.github/workflows/windows-wheel.yml
+    permissions:
+      contents: read
+    with:
+      ref: ${{ inputs.ref || github.ref }}
+
+  publish-testpypi:
+    name: Publish to TestPyPI
+    needs:
+      - build-wheels
+      - build-windows-wheels
+    if: ${{ github.repository == 'open-mpi/pyhwloc' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+    - name: Download distributions
+      uses: actions/download-artifact@v7
+      with:
+        path: dist
+        merge-multiple: true
+
+    - name: Publish distributions to TestPyPI
+      uses: pypa/gh-action-pypi-publish@v1.14.0
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        packages-dir: dist
