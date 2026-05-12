@@ -1,0 +1,47 @@
+name: Publish to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Release tag or Git ref to build and publish.
+        required: true
+        type: string
+
+jobs:
+  build-wheels:
+    uses: ./.github/workflows/manylinux-wheel.yml
+    permissions:
+      contents: read
+      packages: read
+    with:
+      ref: ${{ inputs.ref }}
+
+  build-windows-wheels:
+    uses: ./.github/workflows/windows-wheel.yml
+    permissions:
+      contents: read
+    with:
+      ref: ${{ inputs.ref }}
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs:
+      - build-wheels
+      - build-windows-wheels
+    if: ${{ github.repository == 'open-mpi/pyhwloc' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+    - name: Download distributions
+      uses: actions/download-artifact@v7
+      with:
+        path: dist
+        merge-multiple: true
+
+    - name: Publish distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@v1.14.0
+      with:
+        packages-dir: dist
