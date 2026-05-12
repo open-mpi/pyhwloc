@@ -31,9 +31,6 @@ jobs:
       - build-windows-wheels
     if: ${{ github.repository == 'open-mpi/pyhwloc' }}
     runs-on: ubuntu-latest
-    environment:
-      name: testpypi
-      url: https://test.pypi.org/project/pyhwloc/
     permissions:
       contents: read
       id-token: write
