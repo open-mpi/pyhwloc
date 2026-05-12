@@ -200,7 +200,7 @@ jobs:
         environment-file: dev/pyhwloc_win_dev.yml
 
     - name: Download Windows fat wheel
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         name: Windows-Fat-wheel
         path: dist
