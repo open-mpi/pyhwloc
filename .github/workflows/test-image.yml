@@ -26,7 +26,7 @@ jobs:
       matrix:
         include: ${{ fromJSON(inputs.images || '[{"hwloc_major":3,"tag":"latest"},{"hwloc_major":2,"tag":"v2.13.0"}]') }}
     steps:
-    - uses: actions/checkout@v6.0.3
+    - uses: actions/checkout@v7.0.0
       with:
         ref: ${{ inputs.ref || github.ref }}
     - uses: docker/setup-qemu-action@v4.1.0

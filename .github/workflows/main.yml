@@ -30,7 +30,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     steps:
-    - uses: actions/checkout@v6.0.3
+    - uses: actions/checkout@v7.0.0
       with:
         ref: ${{ inputs.ref || github.ref }}
     - uses: dmlc/xgboost-devops/actions/miniforge-setup@main
@@ -72,7 +72,7 @@ jobs:
         make install
         cd /ws
 
-    - uses: actions/checkout@v6.0.3
+    - uses: actions/checkout@v7.0.0
       with:
         ref: ${{ inputs.ref || github.ref }}
     - name: Install pyhwloc editable
@@ -191,7 +191,7 @@ jobs:
       matrix:
         os: [windows-latest]
     steps:
-    - uses: actions/checkout@v6.0.3
+    - uses: actions/checkout@v7.0.0
       with:
         ref: ${{ inputs.ref || github.ref }}
     - uses: dmlc/xgboost-devops/actions/miniforge-setup@main
