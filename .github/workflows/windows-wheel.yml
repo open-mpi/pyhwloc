@@ -22,12 +22,13 @@ jobs:
         include:
           - arch: amd64
             runner: windows-latest
+            setup: conda
             environment_file: dev/pyhwloc_win_dev.yml
             wheel_tag: win_amd64
             with_cuda: "True"
           - arch: arm64
             runner: windows-11-vs2026-arm
-            environment_file: dev/pyhwloc_win_arm64_dev.yml
+            setup: python
             wheel_tag: win_arm64
             with_cuda: "False"
     steps:
@@ -36,11 +37,23 @@ jobs:
         ref: ${{ inputs.ref || github.ref }}
 
     - uses: conda-incubator/setup-miniconda@v4.0.1
+      if: matrix.setup == 'conda'
       with:
         miniconda-version: latest
         activate-environment: pyhwloc_dev
         environment-file: ${{ matrix.environment_file }}
         conda-remove-defaults: true
+
+    - uses: actions/setup-python@v6.3.0
+      if: matrix.setup == 'python'
+      with:
+        python-version: "3.12"
+
+    - name: Install Python build dependencies
+      if: matrix.setup == 'python'
+      shell: pwsh
+      run: |
+        python -m pip install --upgrade pip hatchling packaging
 
     - name: Build wheel
       shell: pwsh

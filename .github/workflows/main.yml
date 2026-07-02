@@ -193,22 +193,35 @@ jobs:
         include:
           - arch: amd64
             runner: windows-latest
+            setup: conda
             environment_file: dev/pyhwloc_win_dev.yml
             with_cuda: "True"
           - arch: arm64
             runner: windows-11-vs2026-arm
-            environment_file: dev/pyhwloc_win_arm64_dev.yml
+            setup: python
             with_cuda: "False"
     steps:
     - uses: actions/checkout@v6.0.3
       with:
         ref: ${{ inputs.ref || github.ref }}
     - uses: conda-incubator/setup-miniconda@v4.0.1
+      if: matrix.setup == 'conda'
       with:
         miniconda-version: latest
         activate-environment: pyhwloc_dev
         environment-file: ${{ matrix.environment_file }}
         conda-remove-defaults: true
+
+    - uses: actions/setup-python@v6.3.0
+      if: matrix.setup == 'python'
+      with:
+        python-version: "3.12"
+
+    - name: Install Python test dependencies
+      if: matrix.setup == 'python'
+      shell: pwsh
+      run: |
+        python -m pip install --upgrade pip hatchling packaging pytest pytest-cov
 
     - name: Download Windows wheel
       uses: actions/download-artifact@v8
@@ -245,14 +258,22 @@ jobs:
         cd contrib/windows-cmake
         mkdir build
         cd build
-        cmake .. "-GVisual Studio 18 2026" -DBUILD_SHARED_LIBS=ON -DHWLOC_ENABLE_PLUGINS=ON -DCMAKE_INSTALL_PREFIX="$Env:CONDA_PREFIX"
+        if ("${{ matrix.setup }}" -eq "conda") {
+          $HwlocRoot = $Env:CONDA_PREFIX
+        } else {
+          $HwlocRoot = Join-Path $Env:RUNNER_TEMP "hwloc"
+        }
+        New-Item -ItemType Directory -Force -Path $HwlocRoot | Out-Null
+        "PYHWLOC_HWLOC_ROOT_DIR=$HwlocRoot" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+
+        cmake .. "-GVisual Studio 18 2026" -DBUILD_SHARED_LIBS=ON -DHWLOC_ENABLE_PLUGINS=ON -DCMAKE_INSTALL_PREFIX="$HwlocRoot"
         cmake --build . --config Release --parallel "$((Get-WmiObject Win32_Processor).NumberOfLogicalProcessors)"
         cmake --install . --config Release
 
     - name: Install pyhwloc editable
       shell: pwsh
       run: |
-        pip install -e . --no-build-isolation --no-deps --config-settings=hwloc-root-dir="$Env:CONDA_PREFIX" --config-settings=with-cuda=${{ matrix.with_cuda }}
+        pip install -e . --no-build-isolation --no-deps --config-settings=hwloc-root-dir="$Env:PYHWLOC_HWLOC_ROOT_DIR" --config-settings=with-cuda=${{ matrix.with_cuda }}
         python -c "from pyhwloc import Topology"
         git clean -xdf
         pip uninstall pyhwloc -y
@@ -260,7 +281,7 @@ jobs:
     - name: Install pyhwloc with wheel
       shell: pwsh
       run: |
-        pip wheel -v . --no-build-isolation --no-deps --wheel-dir dist --config-settings=hwloc-root-dir="$Env:CONDA_PREFIX" --config-settings=with-cuda=${{ matrix.with_cuda }}
+        pip wheel -v . --no-build-isolation --no-deps --wheel-dir dist --config-settings=hwloc-root-dir="$Env:PYHWLOC_HWLOC_ROOT_DIR" --config-settings=with-cuda=${{ matrix.with_cuda }}
         pip install (Get-ChildItem .\dist\pyhwloc-*.whl).FullName
         python -c "from pyhwloc import Topology"
         git clean -xdf
