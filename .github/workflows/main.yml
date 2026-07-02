@@ -286,3 +286,95 @@ jobs:
         python -c "from pyhwloc import Topology"
         git clean -xdf
         pip uninstall pyhwloc -y
+
+  macOS-Test:
+    name: macOS ${{ matrix.arch }} test
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-latest
+          - arch: x86_64
+            runner: macos-15-intel
+    steps:
+    - uses: actions/checkout@v6.0.3
+      with:
+        ref: ${{ inputs.ref || github.ref }}
+
+    - uses: conda-incubator/setup-miniconda@v4.0.1
+      with:
+        miniconda-version: latest
+        activate-environment: pyhwloc_dev
+        environment-file: dev/pyhwloc_osx_dev.yml
+        conda-remove-defaults: true
+
+    - name: Install hwloc
+      shell: bash -l {0}
+      run: |
+        echo "conda: ${CONDA_PREFIX}"
+        # macOS has no CUDA, so hwloc is built without nvml and installed into the
+        # conda prefix where CMake's find_package(hwloc) can locate it.
+        git clone https://github.com/open-mpi/hwloc.git "${RUNNER_TEMP}/hwloc"
+        pushd "${RUNNER_TEMP}/hwloc"
+        git checkout "$(cat "${GITHUB_WORKSPACE}/dev/hwloc_version")"
+        ./autogen.sh
+        ./configure --prefix="${CONDA_PREFIX}" --disable-nvml
+        make -j"$(sysctl -n hw.ncpu)" install
+        popd
+
+    - name: Install pyhwloc editable
+      shell: bash -l {0}
+      run: |
+        echo "conda: ${CONDA_PREFIX}"
+        pip install -e . --no-deps --no-build-isolation --config-settings=with-cuda=False
+        python -c "from pyhwloc import Topology"
+        git clean -xdf
+        pip uninstall pyhwloc -y
+
+    - name: Install pyhwloc from sdist
+      shell: bash -l {0}
+      run: |
+        echo "conda: ${CONDA_PREFIX}"
+        python -m build . --sdist
+        pip install dist/pyhwloc-*.tar.gz --no-build-isolation --config-settings=with-cuda=False
+        python -c "from pyhwloc import Topology"
+        rm -rf ./dist && git clean -xdf
+        pip uninstall pyhwloc -y
+
+    - name: Install pyhwloc with wheel
+      shell: bash -l {0}
+      run: |
+        echo "conda: ${CONDA_PREFIX}"
+        pip wheel -v . --no-build-isolation --config-settings=with-cuda=False --wheel-dir dist/
+        pip install dist/pyhwloc-*.whl
+        python -c "from pyhwloc import Topology"
+
+    - name: Upload binary wheel
+      uses: actions/upload-artifact@v7
+      with:
+        name: macOS-${{ matrix.arch }}-wheel
+        path: dist/pyhwloc-*.whl
+        if-no-files-found: error
+        retention-days: 7
+
+    - name: Run tests
+      shell: bash -l {0}
+      run: |
+        echo "conda: ${CONDA_PREFIX}"
+        pytest -s -v -rxXs --durations=0 ./tests
+
+    - name: Cleanup
+      shell: bash -l {0}
+      run: |
+        rm -rf ./dist && git clean -xdf
+        pip uninstall pyhwloc -y
+
+    - name: Install pyhwloc with custom hwloc v3
+      shell: bash -l {0}
+      run: |
+        echo "conda: ${CONDA_PREFIX}"
+        pip wheel -v . --config-settings=fetch-hwloc=True --config-settings=with-cuda=False --wheel-dir dist/
+        pip install dist/pyhwloc-*.whl
+        python -c "from pyhwloc import Topology"

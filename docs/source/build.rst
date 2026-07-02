@@ -51,6 +51,13 @@ as CMake can't find its installation.
 
     pip install -e . --no-deps --no-build-isolation --config-settings=hwloc-root-dir="$Env:CONDA_PREFIX"
 
+macOS
+-----
+
+Building on macOS (both Apple Silicon ``arm64`` and Intel ``x86_64``) follows the same
+autotools-based flow as Linux. There is no CUDA on macOS, so pyhwloc must be built with
+``--config-settings=with-cuda=False``.
+
 Linux
 -----
 
