@@ -185,27 +185,38 @@ jobs:
 
   Windows-Test:
     needs: Windows-Wheel
-    runs-on: ${{ matrix.os }}
+    name: Windows ${{ matrix.arch }} test
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
+        include:
+          - arch: amd64
+            runner: windows-latest
+            environment_file: dev/pyhwloc_win_dev.yml
+            with_cuda: "True"
+          - arch: arm64
+            runner: windows-11-vs2026-arm
+            environment_file: dev/pyhwloc_win_arm64_dev.yml
+            with_cuda: "False"
     steps:
     - uses: actions/checkout@v6.0.3
       with:
         ref: ${{ inputs.ref || github.ref }}
-    - uses: dmlc/xgboost-devops/actions/miniforge-setup@main
+    - uses: conda-incubator/setup-miniconda@v4.0.1
       with:
-        environment-name: pyhwloc_dev
-        environment-file: dev/pyhwloc_win_dev.yml
+        miniconda-version: latest
+        activate-environment: pyhwloc_dev
+        environment-file: ${{ matrix.environment_file }}
+        conda-remove-defaults: true
 
-    - name: Download Windows fat wheel
+    - name: Download Windows wheel
       uses: actions/download-artifact@v8
       with:
-        name: Windows-Fat-wheel
+        name: Windows-${{ matrix.arch }}-wheel
         path: dist
 
-    - name: Install pyhwloc from fat wheel
+    - name: Install pyhwloc from wheel
       shell: pwsh
       run: |
         pip install (Get-ChildItem .\dist\pyhwloc-*.whl).FullName
@@ -234,14 +245,14 @@ jobs:
         cd contrib/windows-cmake
         mkdir build
         cd build
-        cmake .. "-GVisual Studio 17 2022" -DBUILD_SHARED_LIBS=ON -DHWLOC_ENABLE_PLUGINS=ON -DCMAKE_INSTALL_PREFIX="$Env:CONDA_PREFIX"
+        cmake .. "-GVisual Studio 18 2026" -DBUILD_SHARED_LIBS=ON -DHWLOC_ENABLE_PLUGINS=ON -DCMAKE_INSTALL_PREFIX="$Env:CONDA_PREFIX"
         cmake --build . --config Release --parallel "$((Get-WmiObject Win32_Processor).NumberOfLogicalProcessors)"
         cmake --install . --config Release
 
     - name: Install pyhwloc editable
       shell: pwsh
       run: |
-        pip install -e . --no-build-isolation --no-deps --config-settings=hwloc-root-dir="$Env:CONDA_PREFIX"
+        pip install -e . --no-build-isolation --no-deps --config-settings=hwloc-root-dir="$Env:CONDA_PREFIX" --config-settings=with-cuda=${{ matrix.with_cuda }}
         python -c "from pyhwloc import Topology"
         git clean -xdf
         pip uninstall pyhwloc -y
@@ -249,7 +260,7 @@ jobs:
     - name: Install pyhwloc with wheel
       shell: pwsh
       run: |
-        pip wheel -v . --no-build-isolation --no-deps --wheel-dir dist --config-settings=hwloc-root-dir="$Env:CONDA_PREFIX"
+        pip wheel -v . --no-build-isolation --no-deps --wheel-dir dist --config-settings=hwloc-root-dir="$Env:CONDA_PREFIX" --config-settings=with-cuda=${{ matrix.with_cuda }}
         pip install (Get-ChildItem .\dist\pyhwloc-*.whl).FullName
         python -c "from pyhwloc import Topology"
         git clean -xdf
