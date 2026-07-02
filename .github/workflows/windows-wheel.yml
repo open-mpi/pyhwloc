@@ -14,21 +14,63 @@ permissions:
 
 jobs:
   build-wheels:
-    runs-on: windows-latest
+    name: Build Windows ${{ matrix.arch }} wheel
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: windows-latest
+            setup: conda
+            environment_file: dev/pyhwloc_win_dev.yml
+            wheel_tag: win_amd64
+            with_cuda: "True"
+          - arch: arm64
+            runner: windows-11-vs2026-arm
+            setup: python
+            wheel_tag: win_arm64
+            with_cuda: "False"
     steps:
     - uses: actions/checkout@v6.0.3
       with:
         ref: ${{ inputs.ref || github.ref }}
 
-    - uses: dmlc/xgboost-devops/actions/miniforge-setup@main
+    - uses: conda-incubator/setup-miniconda@v4.0.1
+      if: matrix.setup == 'conda'
       with:
-        environment-name: pyhwloc_dev
-        environment-file: dev/pyhwloc_win_dev.yml
+        miniconda-version: latest
+        activate-environment: pyhwloc_dev
+        environment-file: ${{ matrix.environment_file }}
+        conda-remove-defaults: true
+
+    - uses: actions/setup-python@v6.3.0
+      if: matrix.setup == 'python'
+      with:
+        python-version: "3.12"
+
+    - name: Install Python build dependencies
+      if: matrix.setup == 'python'
+      shell: pwsh
+      run: |
+        python -m pip install --upgrade pip hatchling packaging
 
     - name: Build wheel
       shell: pwsh
       run: |
-        pip wheel -v . --no-build-isolation --no-deps --wheel-dir dist --config-settings=fetch-hwloc=True
+        pip wheel -v . --no-build-isolation --no-deps --wheel-dir dist --config-settings=fetch-hwloc=True --config-settings=with-cuda=${{ matrix.with_cuda }}
+
+    - name: Check wheel tag
+      shell: pwsh
+      run: |
+        $Wheels = @(Get-ChildItem .\dist\pyhwloc-*.whl)
+        if ($Wheels.Count -ne 1) {
+          throw "Expected exactly one wheel, found $($Wheels.Count)"
+        }
+        $WheelName = $Wheels[0].Name
+        if (-not $WheelName.EndsWith("-${{ matrix.wheel_tag }}.whl")) {
+          throw "Expected wheel tag ${{ matrix.wheel_tag }}, got $WheelName"
+        }
 
     - name: Check wheel
       shell: pwsh
@@ -45,7 +87,7 @@ jobs:
     - name: Upload wheels
       uses: actions/upload-artifact@v7
       with:
-        name: Windows-Fat-wheel
+        name: Windows-${{ matrix.arch }}-wheel
         path: dist/pyhwloc-*.whl
         if-no-files-found: error
         retention-days: 7
