@@ -20,6 +20,8 @@ _file_path = normpath(__file__)
 
 _IS_WINDOWS = sys.platform == "win32"
 
+_IS_MACOS = sys.platform == "darwin"
+
 _IS_DOC_BUILD = bool(os.environ.get("PYHWLOC_SPHINX", False))
 
 _lib_path = normpath(
@@ -34,6 +36,8 @@ _lib_path = normpath(
 def _get_libname(name: str) -> str:
     if _IS_WINDOWS:
         return f"{name}.dll"
+    if _IS_MACOS:
+        return f"lib{name}.dylib"
     return f"lib{name}.so"
 
 
