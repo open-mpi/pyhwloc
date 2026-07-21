@@ -30,7 +30,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     steps:
-    - uses: actions/checkout@v7.0.0
+    - uses: actions/checkout@v7.0.1
       with:
         ref: ${{ inputs.ref || github.ref }}
     - uses: dmlc/xgboost-devops/actions/miniforge-setup@main
@@ -72,7 +72,7 @@ jobs:
         make install
         cd /ws
 
-    - uses: actions/checkout@v7.0.0
+    - uses: actions/checkout@v7.0.1
       with:
         ref: ${{ inputs.ref || github.ref }}
     - name: Install pyhwloc editable
@@ -201,7 +201,7 @@ jobs:
             setup: python
             with_cuda: "False"
     steps:
-    - uses: actions/checkout@v7.0.0
+    - uses: actions/checkout@v7.0.1
       with:
         ref: ${{ inputs.ref || github.ref }}
     - uses: conda-incubator/setup-miniconda@v4.0.1
@@ -212,7 +212,7 @@ jobs:
         environment-file: ${{ matrix.environment_file }}
         conda-remove-defaults: true
 
-    - uses: actions/setup-python@v6.3.0
+    - uses: actions/setup-python@v7.0.0
       if: matrix.setup == 'python'
       with:
         python-version: "3.12"
