@@ -1,0 +1,22 @@
+name: pyhwloc_dev
+channels:
+- conda-forge
+dependencies:
+# -- hwloc
+- libtool
+- automake
+- autoconf
+- pkg-config
+# -- pyhwloc
+- c-compiler
+- cxx-compiler
+- cmake
+- make
+- ninja
+# -- python local
+- python==3.12
+- hatchling
+- python-build
+- pip
+- pytest
+- pytest-cov
