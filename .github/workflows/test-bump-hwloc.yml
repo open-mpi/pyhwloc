@@ -21,7 +21,7 @@ jobs:
       changed: ${{ steps.bump.outputs.changed }}
       bump_ref: ${{ steps.create-pr.outputs.pull-request-branch }}
     steps:
-    - uses: actions/checkout@v7.0.0
+    - uses: actions/checkout@v7.0.1
     - name: Run hwloc bump
       id: bump
       env:
