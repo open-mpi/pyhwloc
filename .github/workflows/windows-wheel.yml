@@ -36,7 +36,7 @@ jobs:
       with:
         ref: ${{ inputs.ref || github.ref }}
 
-    - uses: conda-incubator/setup-miniconda@v4.0.1
+    - uses: conda-incubator/setup-miniconda@v4.1.0
       if: matrix.setup == 'conda'
       with:
         miniconda-version: latest
