@@ -25,6 +25,10 @@ message(STATUS "PYHWLOC_BUILD_HWLOC_CMAKE: ${PYHWLOC_BUILD_HWLOC_CMAKE}")
 add_library(pyhwloc SHARED src/ext/pyhwloc.c)
 
 set(PYHWLOC_OUTPUT_DIR ${pyhwloc_SOURCE_DIR}/src/pyhwloc/_lib/)
+if(NOT WIN32)
+  set(PYHWLOC_HWLOC_LIBRARY
+      ${PYHWLOC_OUTPUT_DIR}/lib/libhwloc${CMAKE_SHARED_LIBRARY_SUFFIX})
+endif()
 
 if(PYHWLOC_FETCH_HWLOC)
   set(PYHWLOC_CONFIG_HWLOC OFF CACHE BOOL "")
@@ -63,6 +67,21 @@ if(PYHWLOC_FETCH_HWLOC)
       execute_process(
         COMMAND ${hwloc_SOURCE_DIR}/autogen.sh WORKING_DIRECTORY ${hwloc_SOURCE_DIR}
       )
+      set(HWLOC_CONFIGURE_ARGS --enable-plugins)
+      if(APPLE)
+        # Keep macOS wheels self-contained. The Darwin and minimal XML backends
+        # remain built into hwloc without optional conda-provided dependencies.
+        set(HWLOC_CONFIGURE_ARGS
+            --disable-plugins
+            --disable-libxml2
+            --disable-pci
+            --disable-opencl
+            --disable-cuda
+            --disable-nvml
+            --disable-rsmi
+            --disable-levelzero
+            --disable-gl)
+      endif()
       # Set compiler flags based on build type
       if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(HWLOC_CFLAGS "CFLAGS=-g -O0")
@@ -73,7 +92,13 @@ if(PYHWLOC_FETCH_HWLOC)
       endif()
       execute_process(
         # Use avoid version to NOT create versioned sonames like: libhwloc.so.0.0.0
-        COMMAND ${hwloc_SOURCE_DIR}/configure --enable-plugins --prefix=${PYHWLOC_OUTPUT_DIR} HWLOC_LDFLAGS=-avoid-version ${HWLOC_CFLAGS} ${HWLOC_CXXFLAGS}
+        COMMAND
+          ${hwloc_SOURCE_DIR}/configure
+          ${HWLOC_CONFIGURE_ARGS}
+          --prefix=${PYHWLOC_OUTPUT_DIR}
+          HWLOC_LDFLAGS=-avoid-version
+          ${HWLOC_CFLAGS}
+          ${HWLOC_CXXFLAGS}
         WORKING_DIRECTORY ${hwloc_BINARY_DIR}
       )
     endif()
@@ -96,11 +121,11 @@ if(PYHWLOC_FETCH_HWLOC)
     set(HWLOC_INCLUDE_DIR ${PYHWLOC_OUTPUT_DIR}/include/)
   else()
     add_custom_command(
-      OUTPUT ${PYHWLOC_OUTPUT_DIR}/lib/libhwloc.so
+      OUTPUT ${PYHWLOC_HWLOC_LIBRARY}
       COMMAND make -j${nproc} install WORKING_DIRECTORY ${hwloc_BINARY_DIR}
     )
-    add_custom_target(install_hwloc DEPENDS ${PYHWLOC_OUTPUT_DIR}/lib/libhwloc.so)
-    set(HWLOC_LIBRARY ${PYHWLOC_OUTPUT_DIR}/lib/libhwloc.so)
+    add_custom_target(install_hwloc DEPENDS ${PYHWLOC_HWLOC_LIBRARY})
+    set(HWLOC_LIBRARY ${PYHWLOC_HWLOC_LIBRARY})
     set(HWLOC_INCLUDE_DIR ${PYHWLOC_OUTPUT_DIR}/include/)
   endif()
 
@@ -148,10 +173,16 @@ foreach(lib IN LISTS PYHWLOC_LIBS)
   # One header for each shared object as Windows distinguishes import and export.
   generate_export_header(${lib})
   if(PYHWLOC_FETCH_HWLOC)
-    set_target_properties(${lib} PROPERTIES
-      INSTALL_RPATH "$ORIGIN/lib"
-      INSTALL_RPATH_USE_LINK_PATH OFF
-      BUILD_RPATH_USE_ORIGIN ON)
+    if(APPLE)
+      set_target_properties(${lib} PROPERTIES
+        INSTALL_RPATH "@loader_path/lib"
+        INSTALL_RPATH_USE_LINK_PATH OFF)
+    else()
+      set_target_properties(${lib} PROPERTIES
+        INSTALL_RPATH "$ORIGIN/lib"
+        INSTALL_RPATH_USE_LINK_PATH OFF
+        BUILD_RPATH_USE_ORIGIN ON)
+    endif()
     add_dependencies(${lib} install_hwloc)
   endif()
 endforeach()
