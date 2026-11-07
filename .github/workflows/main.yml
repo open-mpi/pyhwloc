@@ -212,7 +212,7 @@ jobs:
         environment-file: ${{ matrix.environment_file }}
         conda-remove-defaults: true
 
-    - uses: actions/setup-python@v7.0.0
+    - uses: actions/setup-python@v7.1.0
       if: matrix.setup == 'python'
       with:
         python-version: "3.12"
